@@ -2,255 +2,834 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1C1E21">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#000000">
 <title>Darkroom Buddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#1C1E21;--red:#D43030;--amber:#FF8C00;--dim:#9B4A4A;--border:#3D1111;--pixel:monospace}
+:root{
+  --bg:#000;--surface:#1a1410;--card:#1e1812;--border:#3D1111;
+  --red:#D43030;--amber:#FF8C00;--gold:#FFD700;--dim:#7a5a3a;
+  --glow-amber:rgba(255,140,0,0.4);--glow-red:rgba(212,48,48,0.3);
+  --pixel:'Press Start 2P',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{background:var(--bg);color:var(--red);font-family:var(--pixel);min-height:100vh;min-height:100dvh;overflow-x:hidden}
-button{font-family:var(--pixel);color:var(--red);background:var(--border);border:2px solid var(--red);
-padding:14px 16px;font-size:1.1rem;font-weight:700;min-height:52px;cursor:pointer;width:100%;text-align:left;
--webkit-tap-highlight-color:rgba(255,140,0,0.2);touch-action:manipulation}
-button:active{opacity:0.7;transform:scale(0.98)}
-[tabindex]:focus{outline:3px solid var(--amber);outline-offset:2px}
-.page{display:none;padding:16px;max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh}
+html{background:#000}
+body{background:var(--bg);color:var(--amber);font-family:var(--pixel);min-height:100vh;min-height:100dvh;
+overflow-x:hidden;-webkit-font-smoothing:none;-moz-osx-font-smoothing:unset}
+button{font-family:var(--pixel);cursor:pointer;touch-action:manipulation;border:none;background:none;color:inherit;-webkit-tap-highlight-color:transparent}
+button:active{transform:scale(0.96);opacity:0.8}
+a{color:var(--amber);text-decoration:none}
+
+/* Pages */
+.page{display:none;padding:20px 16px;max-width:420px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative}
 .page.active{display:flex;flex-direction:column}
+@media(max-height:920px){.page{padding:14px 16px}}
 .hidden{display:none!important}
-h1{font-size:1.8rem;color:var(--amber);margin-bottom:8px;text-align:center;letter-spacing:2px}
-h2{font-size:1rem;color:var(--red);margin-bottom:12px;text-align:center}
-.nav-btn{margin-bottom:10px;font-size:1.05rem;letter-spacing:1px;padding:16px}
-.nav-btn .est{float:right;color:var(--dim);font-size:.85rem;margin-top:2px}
-.back-btn{background:none;border:2px solid transparent;color:var(--dim);font-size:1rem;margin-bottom:12px;padding:12px 0;min-height:44px}
-.emg-picker{display:flex;align-items:center;border:2px solid var(--border);margin-bottom:10px;min-height:52px}
-.emg-picker .pick-label{color:var(--dim);font-size:.8rem;padding:0 10px;min-width:75px}
-.emg-picker .pick-prev,.emg-picker .pick-next{background:var(--border);color:var(--amber);font-size:1.4rem;
-padding:10px 16px;min-height:52px;min-width:52px;border:none;width:auto;text-align:center}
-.emg-picker .pick-prev:active,.emg-picker .pick-next:active{background:var(--amber);color:var(--bg)}
-.emg-picker .pick-val{flex:1;text-align:center;color:var(--amber);font-size:1.1rem;padding:8px 4px}
-.stepper{display:flex;align-items:center;margin-bottom:10px}
-.stepper-btn{background:var(--border);color:var(--amber);font-size:1.5rem;padding:10px 20px;min-height:52px;
-min-width:60px;border:2px solid var(--border);width:auto;text-align:center}
-.stepper-btn:active{background:var(--amber);color:var(--bg)}
-.stepper-val{flex:1;text-align:center;color:var(--amber);font-size:1.4rem}
-.stepper-label{color:var(--dim);font-size:.8rem;margin-bottom:4px;display:block}
-.xp-bar{margin:8px 0 14px;text-align:center}
-.xp-bar-label{font-size:.85rem;color:var(--dim);margin-bottom:4px}
-.xp-bar-track{height:10px;background:var(--border);border:1px solid var(--dim);overflow:hidden;border-radius:5px}
-.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));width:0%;border-radius:5px}
-.calc-time{font-size:2.2rem;color:var(--amber);text-align:center;margin:16px 0;padding:12px;border:2px solid var(--amber)}
-.start-btn{display:block;width:100%;padding:18px;font-size:1.2rem;color:var(--bg);background:var(--red);
-border:2px solid #ff4444;letter-spacing:2px;text-align:center;font-weight:900;margin-top:8px}
-.start-btn:active{background:var(--amber)}
-.timer-step{font-size:1.4rem;color:var(--amber);text-align:center;margin-bottom:6px;letter-spacing:2px}
-.timer-display{font-size:5rem;color:var(--amber);text-align:center;line-height:1;margin:12px 0;font-variant-numeric:tabular-nums}
-.timer-progress{width:100%;height:10px;background:var(--border);border:1px solid var(--dim);margin:10px 0;overflow:hidden;border-radius:5px}
-.timer-progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:5px}
-.timer-next{text-align:center;color:var(--dim);font-size:.9rem;margin-bottom:8px}
-.timer-tip{text-align:center;color:var(--dim);font-size:1rem;font-style:italic;margin-bottom:12px}
-.agitate-indicator{width:24px;height:24px;border:2px solid var(--red);background:var(--border);margin:0 auto 8px;opacity:.3;border-radius:50%}
-.agitate-indicator.active{opacity:1;background:var(--amber);border-color:var(--amber)}
-.timer-controls{display:flex;gap:10px;margin-top:12px}
-.timer-controls button{flex:1;text-align:center;padding:16px}
-.hearts{display:flex;gap:4px;justify-content:center;margin:6px 0}
-.heart{font-size:1rem;opacity:.25}.heart.filled{opacity:1}
-.clothesline{padding:12px 0 28px;margin:8px 0;position:relative}
-.clothesline-wire{height:2px;background:var(--dim);position:relative;top:8px}
-.clothesline-prints{display:flex;justify-content:space-around;position:relative}
-.cl-print{width:22px;height:28px;background:var(--border);border:1px solid var(--dim);transform-origin:top center}
-.cl-print.done{background:var(--red);border-color:var(--amber)}.cl-print.active{background:var(--amber)}
-.cl-print-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:.55rem;color:var(--dim);white-space:nowrap}
-.cl-print.done .cl-print-label{color:var(--red)}.cl-print.active .cl-print-label{color:var(--amber)}
+
+/* Back arrow */
+.back-arrow{position:absolute;top:16px;left:16px;width:40px;height:40px;display:flex;align-items:center;
+justify-content:center;font-size:1.4rem;color:var(--amber);z-index:10;padding:0}
+
+/* === HOME SCREEN === */
+.home-title{text-align:center;color:var(--amber);margin-top:16px;line-height:1.3;
+text-shadow:0 0 20px var(--glow-amber);animation:titleGlow 3s ease-in-out infinite}
+.home-title .title-top{display:block;font-size:1.8rem;letter-spacing:8px}
+.home-title .title-bot{display:block;font-size:1.8rem;letter-spacing:14px}
+@keyframes titleGlow{0%,100%{text-shadow:0 0 15px var(--glow-amber)}50%{text-shadow:0 0 30px var(--glow-amber),0 0 50px rgba(255,140,0,0.15)}}
+.home-subtitle{font-size:.6rem;text-align:center;color:var(--dim);margin-top:8px;letter-spacing:2px}
+.home-xp{text-align:center;margin:16px 0 6px;font-size:.8rem;color:var(--gold)}
+.home-xp .star{font-size:1.4rem;vertical-align:middle;margin-right:4px}
+.home-level{text-align:center;font-size:.5rem;color:var(--dim);letter-spacing:2px;margin-bottom:8px}
+.xp-track{height:8px;background:var(--surface);border:1px solid var(--dim);border-radius:4px;margin:0 20px 16px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber),var(--gold));border-radius:4px;width:0%;transition:width .5s;
+position:relative;overflow:hidden}
+.xp-fill::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:xpShimmer 2.5s infinite}
+@keyframes xpShimmer{0%{left:-100%}100%{left:200%}}
+
+/* Card grid */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.card{border-radius:10px;padding:18px 10px;text-align:center;border:2px solid;position:relative;overflow:hidden;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.card:active{transform:scale(0.95);box-shadow:0 0 20px rgba(255,140,0,0.3)}
+
+/* Per-card icon animations */
+.card-icon{display:inline-block;position:relative}
+
+/* B&W: camera flash */
+.card-bw .card-icon{animation:cameraFlash 3s ease-in-out infinite}
+@keyframes cameraFlash{0%,85%,100%{text-shadow:none;transform:scale(1)}
+90%{text-shadow:0 0 20px #fff,0 0 40px #fff;transform:scale(1.1)}
+95%{text-shadow:0 0 5px rgba(255,255,255,0.3);transform:scale(1)}}
+
+/* C-41: rainbow emoji arc animation */
+.card-c41 .card-icon{animation:rainbowArc 3s ease-in-out infinite}
+@keyframes rainbowArc{0%,100%{transform:scale(1) rotate(-3deg);text-shadow:0 0 4px rgba(255,100,0,0.2)}
+50%{transform:scale(1.08) rotate(3deg);text-shadow:0 0 12px rgba(255,100,0,0.4)}}
+
+/* Print: gentle breathing */
+.card-print .card-icon{animation:breathe 3s ease-in-out infinite}
+
+/* Push/Pull: subtle breathing scale */
+.card-push .card-icon{animation:breathe 2.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+/* Timer: hourglass with sand falling */
+.card-timer .card-icon{position:relative}
+.card-timer::after{content:'';position:absolute;top:50%;left:50%;width:2px;height:0;
+background:var(--amber);transform:translateX(-50%);
+animation:sandFall 2s linear infinite;pointer-events:none;opacity:.6;border-radius:1px}
+@keyframes sandFall{0%{height:0;top:38%;opacity:.6}50%{height:12px;top:38%;opacity:.6}100%{height:0;top:60%;opacity:0}}
+
+/* Badges: trophy smooth golden glow (no scale/shake) */
+.card-badges .card-icon{animation:trophyGlow 3s ease-in-out infinite}
+@keyframes trophyGlow{0%,100%{text-shadow:0 0 2px rgba(255,215,0,0.1)}
+50%{text-shadow:0 0 12px rgba(255,215,0,0.5),0 0 24px rgba(255,215,0,0.2)}}
+.card-icon{font-size:2rem;margin-bottom:8px;display:block}
+.card-label{font-size:.65rem;letter-spacing:1px;display:block}
+.card-est{font-size:.45rem;color:rgba(255,255,255,0.6);margin-top:4px;display:block}
+.card-bw{background:linear-gradient(135deg,#2a2520,#1a1510);border-color:#5a4a3a;color:#ccc}
+.card-c41{background:linear-gradient(135deg,#4a1a2a,#1a2a4a);border-color:#ff6b9d;color:#ffb3d0;
+background:linear-gradient(135deg,#c62828,#f57f17,#388e3c,#1565c0,#6a1b9a);border-color:#ff8a65}
+.card-c41 .card-label,.card-c41 .card-est{color:#fff}
+.card-print{background:linear-gradient(135deg,#1b3a1b,#0d2a0d);border-color:#4caf50;color:#81c784}
+.card-push{background:linear-gradient(135deg,#2a1a3a,#1a1030);border-color:#9c27b0;color:#ce93d8}
+.card-timer{background:linear-gradient(135deg,#1a2a3a,#0d1a2a);border-color:#1976d2;color:#64b5f6}
+.card-badges{background:linear-gradient(135deg,#3a3010,#2a2008);border-color:#f9a825;color:#fdd835}
+
+/* Full-width nav buttons */
+.nav-full{width:100%;padding:18px;margin-bottom:10px;background:var(--surface);border:2px solid var(--border);
+border-radius:10px;font-size:.65rem;color:var(--amber);letter-spacing:2px;text-align:center}
+
+/* === SETUP SCREEN === */
+.setup-title{font-size:.85rem;text-align:center;color:var(--amber);letter-spacing:2px;margin:8px 0 16px;padding-top:30px}
+.form-label{font-size:.5rem;color:var(--dim);letter-spacing:2px;margin-bottom:6px;display:block}
+.picker-select{width:100%;padding:14px 16px;background:var(--surface);border:2px solid var(--dim);color:var(--amber);
+font-family:var(--pixel);font-size:.65rem;border-radius:6px;margin-bottom:14px;appearance:none;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23FF8C00' fill='none' stroke-width='2'/%3E%3C/svg%3E");
+background-repeat:no-repeat;background-position:right 12px center}
+.temp-row{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.temp-val{flex:1;padding:10px;background:var(--surface);border:2px solid var(--dim);color:var(--gold);
+font-family:var(--pixel);font-size:.8rem;text-align:center;border-radius:6px}
+.temp-toggle{display:flex;border:2px solid var(--dim);border-radius:6px;overflow:hidden}
+.temp-toggle button{padding:10px 14px;font-size:.5rem;color:var(--dim);background:var(--surface)}
+.temp-toggle button.active{background:var(--amber);color:#000}
+.push-row{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.push-btn{width:44px;height:44px;background:var(--red);color:#fff;font-size:.8rem;border-radius:6px;
+display:flex;align-items:center;justify-content:center;border:2px solid #ff4444}
+.push-val{flex:1;text-align:center;font-size:.7rem;color:var(--gold);background:var(--surface);
+border:2px solid var(--dim);padding:10px;border-radius:6px}
+
+/* LCD Timer Display */
+.lcd-display{margin:10px 0;padding:16px 20px;border:3px solid var(--amber);border-radius:10px;text-align:center;
+background:rgba(255,140,0,0.05);box-shadow:0 0 30px var(--glow-amber),inset 0 0 20px rgba(255,140,0,0.05)}
+.lcd-time{font-size:2.5rem;color:var(--amber);letter-spacing:6px;
+text-shadow:0 0 20px var(--glow-amber),0 0 40px rgba(255,140,0,0.2)}
+
+/* Start button */
+.start-btn{width:100%;padding:20px;margin-top:12px;background:var(--red);border:3px solid #ff4444;
+border-radius:10px;color:#fff;font-size:.8rem;letter-spacing:3px;text-align:center;
+box-shadow:0 0 20px var(--glow-red);text-shadow:0 0 10px rgba(255,255,255,0.3)}
+.start-btn:active{box-shadow:0 0 40px var(--glow-red)}
+
+/* === TIMER SCREEN === */
+.timer-step-name{font-size:.9rem;text-align:center;color:var(--amber);letter-spacing:4px;margin-top:8px;
+text-shadow:0 0 15px var(--glow-amber)}
+.timer-hearts{display:flex;justify-content:center;gap:6px;margin:6px 0}
+.timer-heart{font-size:.85rem;opacity:.2;display:inline-block}
+.timer-heart.filled{opacity:1;color:var(--red)}
+.timer-heart.active-heart{opacity:1;color:var(--red);animation:heartPulse 1.2s ease-in-out infinite}
+@keyframes heartPulse{0%,100%{opacity:.4;transform:scale(0.9)}50%{opacity:1;transform:scale(1.1)}}
+.timer-big{font-size:4rem;text-align:center;color:var(--amber);margin:4px 0;letter-spacing:8px;
+text-shadow:0 0 30px var(--glow-amber),0 0 60px rgba(255,140,0,0.15);font-variant-numeric:tabular-nums;
+animation:timerGlow 2s ease-in-out infinite}
+@keyframes timerGlow{0%,100%{text-shadow:0 0 25px var(--glow-amber),0 0 50px rgba(255,140,0,0.1)}50%{text-shadow:0 0 40px var(--glow-amber),0 0 80px rgba(255,140,0,0.2)}}
+
+/* Clothesline */
+.clothesline{position:relative;padding:16px 0 36px;margin:4px 0}
+.clothesline-wire{height:2px;background:linear-gradient(90deg,transparent 0%,#6a5030 8%,#8a6a40 50%,#6a5030 92%,transparent 100%);
+position:absolute;top:18px;left:6px;right:6px}
+.clothesline-items{display:flex;justify-content:space-around;position:relative;padding:0 4px}
+.cl-item{display:flex;flex-direction:column;align-items:center;position:relative}
+.cl-clip{width:8px;height:12px;background:linear-gradient(180deg,#8a6a40,#6a5030);margin-bottom:1px;border-radius:1px 1px 0 0;
+border:1px solid #9a7a50;border-bottom:none}
+.cl-photo{width:42px;height:50px;border:3px solid #2a2018;background:#151210;position:relative;
+box-shadow:1px 2px 6px rgba(0,0,0,0.6);transition:all .3s}
+.cl-photo::after{content:'';position:absolute;bottom:0;left:0;right:0;height:10px;background:rgba(255,255,255,0.03)}
+.cl-item.done .cl-photo{border-color:var(--amber);
+background:linear-gradient(145deg,#4a3510,#3a2808,#2a1a05);
+box-shadow:0 0 12px var(--glow-amber),0 0 4px rgba(255,140,0,0.3)}
+.cl-item.active .cl-photo{border-color:var(--gold);
+background:linear-gradient(145deg,#5a4015,#4a3010,#3a2208);
+box-shadow:0 0 20px rgba(255,200,0,0.5),0 0 8px var(--glow-amber);transform:scale(1.15)}
+.cl-item.active .cl-photo::before{display:none}
+/* Clothesline swing animation */
+.cl-item.done{animation:swing 3s ease-in-out infinite;transform-origin:top center}
+.cl-item.active{animation:swingActive 2.5s ease-in-out infinite;transform-origin:top center}
+@keyframes swing{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes swingActive{0%,100%{transform:rotate(-1.5deg) scale(1.15)}50%{transform:rotate(1.5deg) scale(1.15)}}
+
+.cl-label{font-size:.4rem;color:#554433;margin-top:8px;text-align:center;letter-spacing:1px}
+.cl-item.done .cl-label{color:var(--amber)}.cl-item.active .cl-label{color:var(--gold);text-shadow:0 0 6px var(--glow-amber)}
+.cl-step-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.8rem;opacity:.5}
+.cl-item.done .cl-step-icon{opacity:.9}
+.cl-item.active .cl-step-icon{opacity:1;filter:drop-shadow(0 0 4px rgba(255,200,0,0.6))}
+
+/* Timer progress */
+.timer-bar{height:10px;background:var(--surface);border:1px solid var(--dim);border-radius:5px;margin:8px 0;
+overflow:hidden;position:relative}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:5px;
+position:relative}
+.timer-bar-fill::after{content:'';position:absolute;right:-5px;top:-3px;width:10px;height:16px;
+background:var(--amber);border-radius:50%;box-shadow:0 0 8px var(--glow-amber)}
+.timer-next{text-align:center;font-size:.55rem;color:var(--dim);margin:8px 0;letter-spacing:1px}
+.timer-next strong{color:var(--amber)}
+.timer-tip{text-align:center;font-size:.5rem;color:var(--dim);font-style:italic;margin:6px 0 6px;line-height:1.8}
+.agitate-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--dim);background:var(--surface);
+margin:0 auto 6px;opacity:.4}
+.agitate-dot.active{background:var(--amber);border-color:var(--amber);opacity:1;box-shadow:0 0 10px var(--glow-amber)}
+
+/* Timer buttons */
+.timer-btns{display:flex;gap:8px;margin-top:16px;padding-bottom:16px}
+.timer-btns button{flex:1;padding:16px 8px;border-radius:8px;font-size:.6rem;letter-spacing:2px;text-align:center}
+.btn-pause{background:var(--red);color:#fff;border:2px solid #ff4444;box-shadow:0 0 10px var(--glow-red)}
+.btn-skip{background:var(--red);color:#fff;border:2px solid #ff4444}
+.btn-exit{background:#333;color:#999;border:2px solid #555}
+
+/* Transfer alert */
 .transfer-alert{position:fixed;inset:0;border:4px solid var(--amber);pointer-events:none;opacity:0;z-index:100}
-.transfer-alert.active{opacity:1;animation:flash .5s infinite}
+.transfer-alert.active{opacity:1;animation:flash .4s infinite}
 @keyframes flash{0%,100%{border-color:var(--amber)}50%{border-color:var(--red)}}
-.ref-card{border:2px solid var(--border);padding:12px;margin-bottom:8px}
-.ref-card h3{color:var(--amber);font-size:1rem;margin-bottom:6px}
-.ref-card p{color:var(--dim);font-size:.95rem;line-height:1.5}
-.log-entry{border:2px solid var(--border);padding:10px;margin-bottom:8px}
-.log-entry .log-date{color:var(--amber);font-size:.8rem}.log-entry .log-detail{color:var(--dim);margin-top:3px}
-.confirm-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px}
-.confirm-box{border:2px solid var(--red);padding:20px;max-width:340px;width:100%;text-align:center;background:var(--bg)}
-.confirm-box p{margin-bottom:14px;color:var(--amber);font-size:1rem;line-height:1.6}
-.confirm-box .btn-row{display:flex;gap:10px}.confirm-box .btn-row button{flex:1;text-align:center}
-.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
-.toggle-group{display:flex;border:2px solid var(--border);overflow:hidden;margin-bottom:10px}
-.toggle-group button{border:none;flex:1;min-height:48px;font-size:.95rem;border-radius:0}
-.toggle-group button.active{background:var(--red);color:var(--bg)}
-.badges-section{margin:10px 0}.badges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.badge{text-align:center;padding:8px 4px;border:2px solid var(--border)}
-.badge.unlocked{border-color:var(--amber)}.badge.locked{opacity:.3}
-.badge-icon{font-size:1.6rem;display:block;margin-bottom:3px}
-.badge-name{font-size:.65rem;color:var(--amber);display:block}.badge.locked .badge-name{color:var(--dim)}
-.badge-desc{font-size:.8rem;color:var(--dim);display:block}
-.badge-progress{height:3px;background:var(--border);margin-top:4px;overflow:hidden}
-.badge-progress-fill{height:100%;background:var(--red)}
-.badges-title{font-size:.9rem;color:var(--amber);margin-bottom:8px}
-.achievement{position:fixed;top:40px;left:50%;transform:translateX(-50%);border:2px solid var(--amber);
-background:var(--bg);padding:10px 20px;z-index:300;font-size:.95rem;color:var(--amber);text-align:center;
-animation:slideIn .3s ease}
-@keyframes slideIn{from{transform:translateX(-50%) translateY(-100%);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
-.form-group{margin-bottom:10px}
+
+/* === CHEMISTRY REFERENCE === */
+.ref-title{font-size:.85rem;color:var(--amber);letter-spacing:2px;margin:8px 0 16px;padding-top:30px}
+.ref-card{background:var(--surface);border:2px solid var(--border);border-left:4px solid var(--amber);
+border-radius:8px;padding:16px;margin-bottom:10px;position:relative}
+.ref-card h3{font-size:.6rem;color:var(--amber);letter-spacing:2px;margin-bottom:8px}
+.ref-card p{font-size:.5rem;color:var(--dim);line-height:2;font-family:var(--sans)}
+.ref-icon{font-size:.7rem;margin-left:4px;vertical-align:baseline}
+
+/* === BADGES/ACHIEVEMENTS === */
+.badge-title{font-size:.85rem;color:var(--amber);letter-spacing:2px;margin:8px 0 8px;padding-top:30px;text-align:center}
+.badge-level{text-align:center;font-size:.5rem;color:var(--dim);letter-spacing:2px;margin-bottom:8px}
+.badge-xp-row{display:flex;align-items:center;gap:8px;margin:0 20px 16px}
+.badge-xp-label{font-size:.35rem;color:var(--amber);border:1px solid var(--amber);padding:2px 6px;border-radius:3px}
+.badge-xp-track{flex:1;height:8px;background:var(--surface);border:1px solid var(--dim);border-radius:4px;overflow:hidden}
+.badge-xp-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:4px}
+.badge-section-title{font-size:.55rem;color:var(--amber);letter-spacing:2px;margin:14px 0 10px;
+border-bottom:1px solid var(--border);padding-bottom:6px}
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.badge-card{background:var(--surface);border:2px solid var(--border);border-radius:8px;padding:10px 6px;
+text-align:center;position:relative}
+.badge-card.unlocked{border-color:var(--amber);box-shadow:0 0 10px var(--glow-amber);animation:badgeGlow 3s ease-in-out infinite}
+@keyframes badgeGlow{0%,100%{box-shadow:0 0 8px var(--glow-amber)}50%{box-shadow:0 0 16px var(--glow-amber),0 0 24px rgba(255,140,0,0.1)}}
+.badge-card.locked{opacity:.4}
+.badge-card-icon{font-size:1.3rem;display:block;margin-bottom:4px}
+.badge-card-name{font-size:.4rem;color:var(--amber);letter-spacing:1px;display:block;margin-bottom:3px}
+.badge-card.locked .badge-card-name{color:var(--dim)}
+.badge-card-desc{font-size:.32rem;color:var(--dim);display:block;margin-bottom:4px;font-family:var(--sans)}
+.badge-card-progress{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px}
+.badge-card-progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:2px}
+.badge-card-count{font-size:.35rem;color:var(--dim);margin-top:3px;display:block}
+
+/* === SESSION LOG === */
+.log-title{font-size:.85rem;color:var(--amber);letter-spacing:2px;margin:8px 0 16px;padding-top:30px}
+.log-entry{background:var(--surface);border:2px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px}
+.log-date{font-size:.45rem;color:var(--amber);letter-spacing:1px}
+.log-mode{font-size:.55rem;color:var(--amber);margin-top:4px;display:block}
+.log-detail{font-size:.45rem;color:var(--dim);margin-top:4px;font-family:var(--sans)}
+.log-btn{width:100%;padding:14px;margin-top:8px;background:var(--surface);border:2px solid var(--border);
+border-radius:8px;font-size:.55rem;color:var(--dim);text-align:center}
+
+/* === CONFIRM MODAL === */
+.confirm-modal{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;
+justify-content:center;z-index:200;padding:20px}
+.confirm-box{background:var(--surface);border:3px solid var(--amber);border-radius:12px;padding:24px;
+max-width:320px;width:100%;text-align:center;box-shadow:0 0 30px var(--glow-amber);
+animation:modalPop .3s cubic-bezier(0.175,0.885,0.32,1.275)}
+@keyframes modalPop{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.confirm-box p{font-size:.6rem;color:var(--amber);line-height:2;margin-bottom:16px}
+.confirm-xp{font-size:1.4rem;color:var(--gold);margin-bottom:12px;display:none;
+animation:xpCountUp .6s cubic-bezier(0.175,0.885,0.32,1.275);
+text-shadow:0 0 20px rgba(255,215,0,0.5),0 0 40px rgba(255,215,0,0.2)}
+.confirm-xp.visible{display:block}
+@keyframes xpCountUp{0%{transform:scale(0) translateY(20px);opacity:0}
+50%{transform:scale(1.3) translateY(-5px);opacity:1}
+100%{transform:scale(1) translateY(0);opacity:1}}
+.confirm-box .btn-row{display:flex;gap:10px}
+.confirm-box .btn-row button{flex:1;padding:14px;border-radius:8px;font-size:.55rem}
+.confirm-box .btn-yes{background:var(--red);color:#fff;border:2px solid #ff4444}
+.confirm-box .btn-no{background:#333;color:#999;border:2px solid #555}
+
+/* Achievement toast */
+.achievement-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+background:var(--surface);border:3px solid var(--amber);border-radius:14px;
+padding:20px 32px;z-index:300;font-size:.65rem;color:var(--amber);text-align:center;
+box-shadow:0 0 40px var(--glow-amber),0 0 80px rgba(255,140,0,0.15);
+animation:achievePop .4s cubic-bezier(0.175,0.885,0.32,1.275) forwards}
+@keyframes achievePop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}
+60%{transform:translate(-50%,-50%) scale(1.1);opacity:1}
+100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.achievement-toast::before{content:'';position:absolute;inset:-6px;border:1px solid rgba(255,140,0,0.2);
+border-radius:18px;animation:achieveRing 1s ease-out forwards;pointer-events:none}
+@keyframes achieveRing{0%{transform:scale(0.8);opacity:1}100%{transform:scale(1.3);opacity:0}}
+
+/* Print setup */
+.print-toggle{display:flex;border:2px solid var(--dim);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.print-toggle button{flex:1;padding:12px;font-size:.45rem;color:var(--dim);background:var(--surface)}
+.print-toggle button.active{background:var(--amber);color:#000}
+
+/* Free timer */
+.free-stepper{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.free-stepper button{width:48px;height:48px;background:var(--surface);border:2px solid var(--dim);
+border-radius:8px;color:var(--amber);font-size:1rem;display:flex;align-items:center;justify-content:center}
+.free-stepper button:active{background:var(--amber);color:#000}
+.free-stepper .free-val{flex:1;text-align:center;font-size:.8rem;color:var(--gold)}
 </style>
 </head>
 <body>
 <div class="transfer-alert" id="transferAlert"></div>
 <div id="confirmModal" class="confirm-modal hidden">
-<div class="confirm-box"><p id="confirmMsg"></p>
-<div class="btn-row"><button id="confirmYes">Yes</button><button id="confirmNo">Cancel</button></div>
-</div></div>
+<div class="confirm-box">
+<div class="confirm-xp" id="confirmXp"></div>
+<p id="confirmMsg"></p>
+<div class="btn-row">
+<button class="btn-yes" id="confirmYes">YES</button>
+<button class="btn-no" id="confirmNo">CANCEL</button>
+</div>
+</div>
+</div>
 
+<!-- ==================== HOME ==================== -->
 <div class="page active" id="pageHome">
-<h1>DARKROOM BUDDY</h1>
-<h2>Your Darkroom Companion</h2>
-<div class="xp-bar"><div style="text-align:center;font-size:1rem;color:var(--amber);margin-bottom:4px">⭐ <span id="scoreVal">0</span> XP</div><div class="xp-bar-label">Level: <span id="levelLabel">Novice</span></div>
-<div class="xp-bar-track"><div class="xp-bar-fill" id="xpFill"></div></div></div>
-<button class="nav-btn" onclick="showSetup('bw')">🎞 Develop B&W Film<span class="est">~27m</span></button>
-<button class="nav-btn" onclick="showSetup('c41')">🌈 Develop C-41 Color<span class="est">~18m</span></button>
-<button class="nav-btn" onclick="showSetup('print')">🖼 Make a Print<span class="est">~20m</span></button>
-<button class="nav-btn" onclick="showSetup('push')">⬆ Push/Pull Process<span class="est">~30m</span></button>
-<button class="nav-btn" onclick="startFreeTimer()">⏱ Free Timer</button>
-<button class="nav-btn" onclick="showPage('pageBadges')">🏆 Badges</button>
-<button class="nav-btn" onclick="showPage('pageRef')">📖 Chemistry Reference</button>
-<button class="nav-btn" onclick="showPage('pageLog')">📋 Session Log</button>
+<div class="home-title"><span class="title-top">DARKROOM</span><span class="title-bot">BUDDY</span></div>
+<div class="home-subtitle">Your Darkroom Companion</div>
+<div class="home-xp"><span class="star">⭐</span> <span id="scoreVal">0</span> XP</div>
+<div class="home-level">DARKROOM LEVEL: <span id="levelLabel">NOVICE</span></div>
+<div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+
+<div class="card-grid">
+<button class="card card-bw" onclick="beepSelect();showSetup('bw')">
+<span class="card-icon">📷</span><span class="card-label">B&W Film</span><span class="card-est">~27min</span>
+</button>
+<button class="card card-c41" onclick="beepSelect();showSetup('c41')">
+<span class="card-icon">🌈</span><span class="card-label">C-41 Color</span><span class="card-est">~18min</span>
+</button>
+<button class="card card-print" onclick="beepSelect();showSetup('print')">
+<span class="card-icon">🖼</span><span class="card-label">Print</span><span class="card-est">~4min</span>
+</button>
+<button class="card card-push" onclick="beepSelect();showSetup('push')">
+<span class="card-icon">⬆</span><span class="card-label">Push/Pull</span><span class="card-est">~30min</span>
+</button>
+<button class="card card-timer" onclick="beepSelect();startFreeTimer()">
+<span class="card-icon">⏳</span><span class="card-label">Timer</span><span class="card-est">custom</span>
+</button>
+<button class="card card-badges" onclick="beepSelect();showPage('pageBadges')">
+<span class="card-icon">🏆</span><span class="card-label">Badges</span><span class="card-est">&nbsp;</span>
+</button>
 </div>
 
+<button class="nav-full" onclick="beepSelect();showPage('pageRef')">Chemistry Reference</button>
+<button class="nav-full" onclick="beepSelect();showPage('pageLog')">Session Log</button>
+</div>
+
+<!-- ==================== SETUP ==================== -->
 <div class="page" id="pageSetup">
-<button class="back-btn" onclick="showPage('pageHome')">← Back</button>
-<h1 id="setupTitle">Setup</h1>
-<div id="setupFilm" class="form-group"><div class="emg-picker"><span class="pick-label">Film</span><button class="pick-prev" onclick="pickPrev('film')">◄</button><span class="pick-val" id="filmPickVal">—</span><button class="pick-next" onclick="pickNext('film')">►</button></div></div>
-<div id="setupDev" class="form-group"><div class="emg-picker"><span class="pick-label">Dev</span><button class="pick-prev" onclick="pickPrev('dev')">◄</button><span class="pick-val" id="devPickVal">—</span><button class="pick-next" onclick="pickNext('dev')">►</button></div></div>
-<div id="setupDilution" class="form-group"><div class="emg-picker"><span class="pick-label">Dilution</span><button class="pick-prev" onclick="pickPrev('dil')">◄</button><span class="pick-val" id="dilPickVal">—</span><button class="pick-next" onclick="pickNext('dil')">►</button></div></div>
-<div class="form-group"><span class="stepper-label">Temperature</span>
-<div class="row"><div class="stepper"><button class="stepper-btn" onclick="adjTemp(-1)">−</button><span class="stepper-val" id="tempVal">68°F</span><button class="stepper-btn" onclick="adjTemp(1)">+</button></div>
-<div class="toggle-group"><button class="active" id="btnF" onclick="setTempUnit('F')">°F</button><button id="btnC" onclick="setTempUnit('C')">°C</button></div></div></div>
-<div id="setupPush" class="form-group"><span class="stepper-label">Push / Pull</span><div class="stepper"><button class="stepper-btn" onclick="adjPush(-1)">−</button><span class="stepper-val" id="pushVal">0</span><button class="stepper-btn" onclick="adjPush(1)">+</button></div></div>
-<div class="calc-time" id="calcTime">--:--</div>
-<button class="start-btn" onclick="startProcess()">▶ START PROCESS</button>
+<button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
+<div class="setup-title" id="setupTitle">B&W FILM DEVELOPMENT</div>
+
+<div id="setupFilm">
+<span class="form-label">FILM</span>
+<select class="picker-select" id="selFilm" onchange="updateCalcTime()"></select>
+</div>
+<div id="setupDev">
+<span class="form-label">DEVELOPER</span>
+<select class="picker-select" id="selDev" onchange="updateCalcTime()"></select>
+</div>
+<div id="setupDilution">
+<span class="form-label">DILUTION</span>
+<select class="picker-select" id="selDilution" onchange="updateCalcTime()"></select>
 </div>
 
+<div class="temp-row">
+<input type="number" class="temp-val" id="inpTemp" value="68" onchange="updateCalcTime()">
+<div class="temp-toggle">
+<button class="active" id="btnF" onclick="setTempUnit('F')">F</button>
+<button id="btnC" onclick="setTempUnit('C')">C</button>
+</div>
+</div>
+
+<div id="setupPush">
+<span class="form-label">PUSH / PULL</span>
+<div class="push-row">
+<button class="push-btn" onclick="beepNav();adjPush(-1)">−</button>
+<div class="push-val" id="pushVal">0</div>
+<button class="push-btn" onclick="beepNav();adjPush(1)">+</button>
+</div>
+</div>
+
+<div class="lcd-display"><div class="lcd-time" id="calcTime">--:--</div></div>
+<button class="start-btn" onclick="beepSelect();startProcess()">START PROCESS</button>
+</div>
+
+<!-- ==================== PRINT SETUP ==================== -->
 <div class="page" id="pagePrintSetup">
-<button class="back-btn" onclick="showPage('pageHome')">← Back</button>
-<h1>Print Making</h1>
-<div class="toggle-group"><button class="active" id="btnTestStrip" onclick="setPrintMode('test')">Test Strip</button><button id="btnFinalExp" onclick="setPrintMode('final')">Final Exp</button></div>
-<div id="testStripOpts"><span class="stepper-label">Base Exposure (sec)</span><div class="stepper"><button class="stepper-btn" onclick="adjVal('baseExp',-1)">−</button><span class="stepper-val" id="baseExpVal">5</span><button class="stepper-btn" onclick="adjVal('baseExp',1)">+</button></div>
-<span class="stepper-label">Number of Strips</span><div class="stepper"><button class="stepper-btn" onclick="adjVal('strips',-1)">−</button><span class="stepper-val" id="stripsVal">5</span><button class="stepper-btn" onclick="adjVal('strips',1)">+</button></div></div>
-<div id="finalExpOpts" class="hidden"><span class="stepper-label">Exposure Time (sec)</span><div class="stepper"><button class="stepper-btn" onclick="adjVal('finalExp',-1)">−</button><span class="stepper-val" id="finalExpVal">12</span><button class="stepper-btn" onclick="adjVal('finalExp',1)">+</button></div></div>
-<button class="start-btn" onclick="startPrint()">▶ START EXPOSURE</button>
+<button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
+<div class="setup-title">PRINT MAKING</div>
+
+<div class="print-toggle">
+<button class="active" id="btnTestStrip" onclick="setPrintMode('test')">TEST STRIP</button>
+<button id="btnFinalExp" onclick="setPrintMode('final')">FINAL EXP</button>
 </div>
 
+<div id="testStripOpts">
+<span class="form-label">BASE EXPOSURE (SEC)</span>
+<div class="free-stepper">
+<button onclick="beepNav();adjVal('baseExp',-1)">−</button>
+<span class="free-val" id="baseExpVal">5</span>
+<button onclick="beepNav();adjVal('baseExp',1)">+</button>
+</div>
+<span class="form-label">NUMBER OF STRIPS</span>
+<div class="free-stepper">
+<button onclick="beepNav();adjVal('strips',-1)">−</button>
+<span class="free-val" id="stripsVal">5</span>
+<button onclick="beepNav();adjVal('strips',1)">+</button>
+</div>
+</div>
+
+<div id="finalExpOpts" class="hidden">
+<span class="form-label">EXPOSURE TIME (SEC)</span>
+<div class="free-stepper">
+<button onclick="beepNav();adjVal('finalExp',-1)">−</button>
+<span class="free-val" id="finalExpVal">12</span>
+<button onclick="beepNav();adjVal('finalExp',1)">+</button>
+</div>
+</div>
+
+<button class="start-btn" onclick="beepSelect();startPrint()">START EXPOSURE</button>
+</div>
+
+<!-- ==================== TIMER ==================== -->
 <div class="page" id="pageTimer">
-<div class="timer-step" id="timerStepName">DEVELOPER</div>
-<div class="hearts" id="heartsRow"></div>
-<div class="agitate-indicator" id="agitateInd"></div>
-<div class="timer-display" id="timerDisplay">00:00</div>
-<div class="clothesline" id="clotheslineWrap"><div class="clothesline-wire"></div><div class="clothesline-prints" id="clotheslinePrints"></div></div>
-<div class="timer-progress"><div class="timer-progress-fill" id="timerProgressFill"></div></div>
+<div class="timer-step-name" id="timerStepName">DEVELOPER 🧪</div>
+<div class="timer-hearts" id="heartsRow"></div>
+<div class="agitate-dot" id="agitateInd"></div>
+<div class="timer-big" id="timerDisplay">00:00</div>
+
+<div class="clothesline" id="clotheslineWrap">
+<div class="clothesline-wire"></div>
+<div class="clothesline-items" id="clotheslinePrints"></div>
+</div>
+
+<div class="timer-bar"><div class="timer-bar-fill" id="timerProgressFill" style="width:0%"></div></div>
 <div class="timer-next" id="timerNext"></div>
 <div class="timer-tip" id="timerTip"></div>
-<div class="timer-controls"><button id="btnPause" onclick="togglePause()">⏸ Pause</button><button onclick="skipStep()">⏭ Skip</button></div>
+
+<div class="timer-btns">
+<button class="btn-pause" id="btnPause" onclick="beepNav();togglePause()">PAUSE</button>
+<button class="btn-skip" onclick="beepNav();skipStep()">SKIP</button>
+<button class="btn-exit" onclick="beepNav();exitTimer()">EXIT</button>
+</div>
 </div>
 
+<!-- ==================== FREE TIMER ==================== -->
 <div class="page" id="pageFreeTimer">
-<button class="back-btn" onclick="showPage('pageHome')">← Back</button>
-<h1>Free Timer</h1>
-<span class="stepper-label">Minutes</span><div class="stepper"><button class="stepper-btn" onclick="adjVal('freeMin',-1)">−</button><span class="stepper-val" id="freeMinVal">5</span><button class="stepper-btn" onclick="adjVal('freeMin',1)">+</button></div>
-<span class="stepper-label">Seconds</span><div class="stepper"><button class="stepper-btn" onclick="adjVal('freeSec',-5)">−</button><span class="stepper-val" id="freeSecVal">0</span><button class="stepper-btn" onclick="adjVal('freeSec',5)">+</button></div>
-<button class="start-btn" onclick="startFree()">▶ START</button>
+<button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
+<div class="setup-title">FREE TIMER</div>
+
+<span class="form-label">MINUTES</span>
+<div class="free-stepper">
+<button onclick="beepNav();adjVal('freeMin',-1)">−</button>
+<span class="free-val" id="freeMinVal">5</span>
+<button onclick="beepNav();adjVal('freeMin',1)">+</button>
 </div>
 
+<span class="form-label">SECONDS</span>
+<div class="free-stepper">
+<button onclick="beepNav();adjVal('freeSec',-5)">−</button>
+<span class="free-val" id="freeSecVal">0</span>
+<button onclick="beepNav();adjVal('freeSec',5)">+</button>
+</div>
+
+<button class="start-btn" onclick="beepSelect();startFree()">START</button>
+</div>
+
+<!-- ==================== BADGES ==================== -->
 <div class="page" id="pageBadges">
-<button class="back-btn" onclick="showPage('pageHome')">← Back</button>
-<h1>🏆 Badges</h1>
-<div class="xp-bar"><div class="xp-bar-label">Level: <span id="badgeLevelLabel">Novice</span></div><div class="xp-bar-track"><div class="xp-bar-fill" id="badgeXpFill"></div></div></div>
-<div class="badges-section"><div class="badges-title">🎞 Film</div><div class="badges-grid" id="filmBadges"></div></div>
-<div class="badges-section"><div class="badges-title">🖼 Print</div><div class="badges-grid" id="printBadges"></div></div>
-<div class="badges-section"><div class="badges-title">⭐ Mastery</div><div class="badges-grid" id="masteryBadges"></div></div>
+<button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
+<div class="badge-title">🏆 ACHIEVEMENTS</div>
+<div class="badge-level">LEVEL <span id="badgeLevelLabel">NOVICE</span></div>
+<div class="badge-xp-row">
+<span class="badge-xp-label">XP</span>
+<div class="badge-xp-track"><div class="badge-xp-fill" id="badgeXpFill" style="width:0%"></div></div>
+</div>
+<div class="badge-section-title">FILM DEVELOPING</div>
+<div class="badge-grid" id="filmBadges"></div>
+<div class="badge-section-title">PRINTING</div>
+<div class="badge-grid" id="printBadges"></div>
+<div class="badge-section-title">MASTERY</div>
+<div class="badge-grid" id="masteryBadges"></div>
 </div>
 
+<!-- ==================== REFERENCE ==================== -->
 <div class="page" id="pageRef">
-<button class="back-btn" onclick="showPage('pageHome')">← Back</button>
-<h1>📖 Chemistry Reference</h1>
-<div class="ref-card"><h3>🧪 Developer</h3><p>Converts exposed silver halide into metallic silver. Time and temperature are critical — overdevelopment increases contrast and grain.</p></div>
-<div class="ref-card"><h3>🛑 Stop Bath</h3><p>Acidic solution that instantly halts development. 30 seconds with gentle agitation is enough.</p></div>
-<div class="ref-card"><h3>🔧 Fixer</h3><p>Removes unexposed silver halide, making the image permanent. Under-fixing leaves a milky/purple cast. Film needs ~5 min.</p></div>
-<div class="ref-card"><h3>💧 Hypo Clear</h3><p>Washing aid that cuts final wash from 30 min to 5-10 min. Saves water and time.</p></div>
-<div class="ref-card"><h3>🫧 Photo-Flo</h3><p>Wetting agent preventing water spots on film. One drop per tank. Do NOT agitate — let it sit perfectly still.</p></div>
-<div class="ref-card"><h3>🌡 Temperature & Time</h3><p>Standard: 68°F/20°C. Each 1°F above reduces time ~10%. Below 65°F chemistry becomes sluggish.</p></div>
-<div class="ref-card"><h3>🔄 Agitation</h3><p><strong>Inversion:</strong> Flip 4x in 5s, every 30-60s. <strong>Rotary:</strong> Continuous, reduce times ~15%. <strong>Tray:</strong> Rock corner-to-corner for prints.</p></div>
-<div class="ref-card"><h3>⬆ Push / Pull</h3><p><strong>Push (+):</strong> +1 stop ≈ +30% time. More grain & contrast. <strong>Pull (−):</strong> −1 stop ≈ −20% time. Less contrast. Best within ±2 stops.</p></div>
+<button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
+<div class="ref-title">CHEMISTRY GUIDE 📖</div>
+<div class="ref-card"><h3>DEVELOPER <span class="ref-icon">🧪</span></h3><p>Converts exposed silver halide crystals into metallic silver. Time and temperature are critical — overdevelopment increases contrast and grain.</p></div>
+<div class="ref-card"><h3>STOP BATH <span class="ref-icon">🛑</span></h3><p>Halts development by neutralizing the developer. 30 seconds with gentle agitation is enough.</p></div>
+<div class="ref-card"><h3>FIXER <span class="ref-icon">🔧</span></h3><p>Removes unexposed silver halide, making the image permanent. Under-fixing leaves a milky/purple cast. Film needs ~5 min.</p></div>
+<div class="ref-card"><h3>HYPO CLEAR <span class="ref-icon">💧</span></h3><p>Shortens washing time by aiding removal of fixer. Cuts final wash from 30 min to 5-10 min.</p></div>
+<div class="ref-card"><h3>PHOTO-FLO <span class="ref-icon">🫧</span></h3><p>Minimizes water spots and streaks during drying. One drop per tank. Do NOT agitate — let it sit perfectly still.</p></div>
+<div class="ref-card"><h3>TEMPERATURE & TIME <span class="ref-icon">🌡</span></h3><p>Standard: 68°F / 20°C. Each 1°F above reduces time ~10%. Below 65°F chemistry becomes sluggish.</p></div>
+<div class="ref-card"><h3>AGITATION <span class="ref-icon">🔄</span></h3><p>Inversion: Flip 4x in 5s, every 30-60s. Rotary: Continuous in Jobo, reduce times ~15%. Tray: Rock corner-to-corner for prints.</p></div>
+<div class="ref-card"><h3>PUSH / PULL <span class="ref-icon">⬆</span></h3><p>Push (+1 stop) ≈ +30% time, more grain & contrast. Pull (−1 stop) ≈ −20% time, less contrast. Best within ±2 stops.</p></div>
 </div>
 
+<!-- ==================== SESSION LOG ==================== -->
 <div class="page" id="pageLog">
-<button class="back-btn" onclick="showPage('pageHome')">← Back</button>
-<h1>📋 Session Log</h1>
-<div id="logEntries"><p style="color:var(--dim)">No sessions yet. Complete a process to earn XP!</p></div>
-<button onclick="exportLog()" style="margin-top:8px">📤 Export Log</button>
-<button onclick="clearAll()" style="margin-top:6px;color:var(--dim);border-color:var(--border)">🗑 Clear All Data</button>
+<button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
+<div class="log-title">SESSION LOG 📋</div>
+<div id="logEntries"><p style="color:var(--dim);font-size:.4rem;text-align:center;margin:20px 0">No sessions yet. Complete a process to earn XP!</p></div>
+<button class="log-btn" onclick="exportLog()">📤 EXPORT LOG</button>
+<button class="log-btn" onclick="clearAll()">🗑 CLEAR ALL DATA</button>
 </div>
 
+<!-- ==================== SCRIPT ==================== -->
 <script>
 var DEV_CHART={"Tri-X 400":{"D-76 Stock":{t:480},"D-76 1+1":{t:570},"HC-110 Dil B":{t:390},"Rodinal 1+25":{t:660},"Rodinal 1+50":{t:900},"Xtol Stock":{t:420},"Xtol 1+1":{t:510},"ID-11 Stock":{t:480},"ID-11 1+1":{t:570}},"HP5+":{"D-76 Stock":{t:450},"D-76 1+1":{t:540},"HC-110 Dil B":{t:360},"Rodinal 1+25":{t:600},"Rodinal 1+50":{t:840},"Xtol Stock":{t:390},"Xtol 1+1":{t:480},"ID-11 Stock":{t:450},"ID-11 1+1":{t:540}},"T-Max 100":{"D-76 Stock":{t:420},"D-76 1+1":{t:540},"HC-110 Dil B":{t:330},"Rodinal 1+25":{t:600},"Rodinal 1+50":{t:720},"Xtol Stock":{t:390},"Xtol 1+1":{t:480},"ID-11 Stock":{t:420},"ID-11 1+1":{t:540}},"T-Max 400":{"D-76 Stock":{t:420},"D-76 1+1":{t:510},"HC-110 Dil B":{t:330},"Rodinal 1+25":{t:660},"Rodinal 1+50":{t:780},"Xtol Stock":{t:390},"Xtol 1+1":{t:480},"ID-11 Stock":{t:420},"ID-11 1+1":{t:510}},"Delta 100":{"D-76 Stock":{t:390},"D-76 1+1":{t:480},"HC-110 Dil B":{t:330},"Rodinal 1+25":{t:540},"Rodinal 1+50":{t:720},"Xtol Stock":{t:360},"Xtol 1+1":{t:450},"ID-11 Stock":{t:390},"ID-11 1+1":{t:480}},"Delta 400":{"D-76 Stock":{t:450},"D-76 1+1":{t:540},"HC-110 Dil B":{t:360},"Rodinal 1+25":{t:660},"Rodinal 1+50":{t:840},"Xtol Stock":{t:420},"Xtol 1+1":{t:510},"ID-11 Stock":{t:450},"ID-11 1+1":{t:540}},"Delta 3200":{"D-76 Stock":{t:660},"D-76 1+1":{t:780},"HC-110 Dil B":{t:510},"Rodinal 1+25":{t:900},"Rodinal 1+50":{t:1200},"Xtol Stock":{t:600},"Xtol 1+1":{t:720},"ID-11 Stock":{t:660},"ID-11 1+1":{t:780}},"FP4+":{"D-76 Stock":{t:390},"D-76 1+1":{t:480},"HC-110 Dil B":{t:300},"Rodinal 1+25":{t:510},"Rodinal 1+50":{t:720},"Xtol Stock":{t:360},"Xtol 1+1":{t:420},"ID-11 Stock":{t:390},"ID-11 1+1":{t:480}},"Pan F+":{"D-76 Stock":{t:360},"D-76 1+1":{t:450},"HC-110 Dil B":{t:300},"Rodinal 1+25":{t:480},"Rodinal 1+50":{t:660},"Xtol Stock":{t:330},"Xtol 1+1":{t:420},"ID-11 Stock":{t:360},"ID-11 1+1":{t:450}},"Acros II":{"D-76 Stock":{t:405},"D-76 1+1":{t:510},"HC-110 Dil B":{t:345},"Rodinal 1+25":{t:570},"Rodinal 1+50":{t:750},"Xtol Stock":{t:375},"Xtol 1+1":{t:465},"ID-11 Stock":{t:405},"ID-11 1+1":{t:510}},"Fomapan 400":{"D-76 Stock":{t:510},"D-76 1+1":{t:600},"HC-110 Dil B":{t:390},"Rodinal 1+25":{t:720},"Rodinal 1+50":{t:960},"Xtol Stock":{t:450},"Xtol 1+1":{t:540},"ID-11 Stock":{t:510},"ID-11 1+1":{t:600}}};
-var FILMS=Object.keys(DEV_CHART),C41_FILMS=['Portra 400','Portra 160','Portra 800','Ektar 100','Gold 200','Ultramax 400'];
+var FILMS=Object.keys(DEV_CHART);
+var C41_FILMS=['Portra 400','Portra 160','Portra 800','Ektar 100','Gold 200','Ultramax 400'];
 var DEVS=["D-76 Stock","D-76 1+1","HC-110 Dil B","Rodinal 1+25","Rodinal 1+50","Xtol Stock","Xtol 1+1","ID-11 Stock","ID-11 1+1"];
 var DILUTIONS=['Stock','1+1','1+25','1+50'];
 var currentMode='bw',tempUnit='F',tempVal=68,pushStops=0,audioCtx=null;
-var timerState={steps:[],current:0,remaining:0,total:0,elapsed:0,running:false,paused:false,lastAgitate:0,lastTimestamp:0,transferCountdown:0};
+var ts={steps:[],cur:0,rem:0,total:0,elapsed:0,running:false,paused:false,lastAg:0,lastTs:0,xfer:0,info:{}};
 var printMode='test';
-var pickers={film:{items:FILMS,idx:0},dev:{items:DEVS,idx:0},dil:{items:DILUTIONS,idx:0}};
 var stepperVals={baseExp:5,strips:5,finalExp:12,freeMin:5,freeSec:0};
 var stepperLimits={baseExp:{min:1,max:120,step:1},strips:{min:2,max:12,step:1},finalExp:{min:1,max:300,step:1},freeMin:{min:0,max:60,step:1},freeSec:{min:0,max:55,step:5}};
 var $=function(id){return document.getElementById(id)};
-var fmt=function(s){var m=Math.floor(Math.abs(s)/60),sec=Math.floor(Math.abs(s)%60);return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0')};
-function pickPrev(n){var p=pickers[n];if(!p||!p.items.length)return;p.idx=(p.idx-1+p.items.length)%p.items.length;updatePickerDisplay(n);updateCalcTime();}
-function pickNext(n){var p=pickers[n];if(!p||!p.items.length)return;p.idx=(p.idx+1)%p.items.length;updatePickerDisplay(n);updateCalcTime();}
-function updatePickerDisplay(n){var p=pickers[n];if(!p)return;var el=$(n==='film'?'filmPickVal':n==='dev'?'devPickVal':'dilPickVal');if(el)el.textContent=p.items[p.idx]||'—';}
-function getPickerVal(n){var p=pickers[n];return p&&p.items.length?p.items[p.idx]:'';}
-function adjVal(n,d){var l=stepperLimits[n];if(!l)return;stepperVals[n]=Math.max(l.min,Math.min(l.max,stepperVals[n]+d*l.step));var el=$(n+'Val');if(el)el.textContent=stepperVals[n];}
-function adjTemp(d){tempVal+=d;$('tempVal').textContent=tempVal+'°'+tempUnit;updateCalcTime();}
-function showPage(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});$(id).classList.add('active');if(id==='pageLog')renderLog();if(id==='pageBadges')renderBadges();if(id==='pageTimer'){buildHearts();buildClothesline();}}
-function showSetup(m){currentMode=m;if(m==='print'){showPage('pagePrintSetup');return;}showPage('pageSetup');var c41=m==='c41';$('setupTitle').textContent=m==='bw'?'B&W Development':c41?'C-41 Color':'Push/Pull';if(c41){pickers.film.items=C41_FILMS;pickers.dev.items=['C-41 Kit'];$('setupDilution').classList.add('hidden');}else{pickers.film.items=FILMS;pickers.dev.items=DEVS;$('setupDilution').classList.remove('hidden');}pickers.film.idx=0;pickers.dev.idx=0;pickers.dil.idx=0;updatePickerDisplay('film');updatePickerDisplay('dev');updatePickerDisplay('dil');pushStops=0;$('pushVal').textContent='0';$('setupPush').classList.toggle('hidden',c41);updateCalcTime();}
-function setTempUnit(u){tempUnit=u;$('btnF').classList.toggle('active',u==='F');$('btnC').classList.toggle('active',u==='C');if(u==='C')tempVal=Math.round((tempVal-32)*5/9);else tempVal=Math.round(tempVal*9/5+32);$('tempVal').textContent=tempVal+'°'+tempUnit;updateCalcTime();}
+var fmt=function(s){var m=Math.floor(Math.abs(s)/60),sc=Math.floor(Math.abs(s)%60);return String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0')};
+
+function showPage(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});$(id).classList.add('active');if(id==='pageLog')renderLog();if(id==='pageBadges')renderBadges();if(id==='pageTimer'){buildHearts();buildClothesline();}window.scrollTo(0,0);}
+
+function showSetup(m){currentMode=m;if(m==='print'){showPage('pagePrintSetup');return;}
+showPage('pageSetup');var c41=m==='c41';
+$('setupTitle').textContent=m==='bw'?'B&W FILM DEVELOPMENT':c41?'C-41 COLOR DEVELOPMENT':'PUSH/PULL PROCESSING';
+var sf=$('selFilm');sf.innerHTML='';(c41?C41_FILMS:FILMS).forEach(function(f){var o=document.createElement('option');o.value=f;o.textContent=f;sf.appendChild(o);});
+var sd=$('selDev');sd.innerHTML='';(c41?['C-41 Kit']:DEVS).forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;sd.appendChild(o);});
+$('setupDilution').classList.toggle('hidden',c41);
+if(!c41){var sdil=$('selDilution');sdil.innerHTML='';DILUTIONS.forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;sdil.appendChild(o);});}
+pushStops=0;$('pushVal').textContent='0';$('setupPush').classList.toggle('hidden',c41);
+$('inpTemp').value=tempVal;updateCalcTime();}
+
+function setTempUnit(u){tempUnit=u;$('btnF').classList.toggle('active',u==='F');$('btnC').classList.toggle('active',u==='C');
+if(u==='C')tempVal=Math.round((tempVal-32)*5/9);else tempVal=Math.round(tempVal*9/5+32);
+$('inpTemp').value=tempVal;updateCalcTime();}
 function adjPush(d){pushStops=Math.max(-3,Math.min(3,pushStops+d));$('pushVal').textContent=(pushStops>0?'+':'')+pushStops;updateCalcTime();}
-function getBaseDevTime(){if(currentMode==='c41')return 210;var f=getPickerVal('film'),d=getPickerVal('dev');if(DEV_CHART[f]&&DEV_CHART[f][d])return DEV_CHART[f][d].t;return 480;}
-function updateCalcTime(){var t=getBaseDevTime(),tf=tempVal;if(tempUnit==='C')tf=tf*9/5+32;t*=Math.pow(0.9,tf-68);if(pushStops>0)t*=Math.pow(1.3,pushStops);else if(pushStops<0)t*=Math.pow(0.8,Math.abs(pushStops));t=Math.max(60,Math.round(t));$('calcTime').textContent=fmt(t);$('calcTime').dataset.seconds=t;}
-function setPrintMode(m){printMode=m;$('btnTestStrip').classList.toggle('active',m==='test');$('btnFinalExp').classList.toggle('active',m==='final');$('testStripOpts').classList.toggle('hidden',m!=='test');$('finalExpOpts').classList.toggle('hidden',m!=='final');}
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-function beep(f,d,c){try{initAudio();c=c||1;for(var i=0;i<c;i++){var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=f;o.type='sine';var s=audioCtx.currentTime+i*(d+0.08);g.gain.setValueAtTime(0.15,s);g.gain.exponentialRampToValueAtTime(0.001,s+d);o.start(s);o.stop(s+d+0.05);}}catch(e){}}
-function beepAgitate(){beep(880,0.1)}function beepTransition(){beep(523,0.12);setTimeout(function(){beep(659,0.18)},140);}function beepTransfer(){beep(880,0.08,3)}
-function beepComplete(){beep(523,0.15);setTimeout(function(){beep(659,0.15)},170);setTimeout(function(){beep(784,0.15)},340);setTimeout(function(){beep(1047,0.3)},510);}
-function buildBWSteps(dt){return[{name:'💧 Pre-Wash',time:60,tip:'Fill tank at dev temperature.',agitate:0},{name:'🧪 Developer',time:dt,tip:'Agitate continuously first 30s, then per interval.',agitate:30},{name:'🛑 Stop Bath',time:30,tip:'3-4 gentle inversions is enough.',agitate:0},{name:'🔧 Fixer',time:300,tip:'Under-fixing causes purple stains.',agitate:60},{name:'🚿 Wash',time:600,tip:'Running water or fill-and-dump 5x.',agitate:0},{name:'🫧 Photo-Flo',time:60,tip:'Do NOT agitate — let it sit perfectly still.',agitate:0}];}
-function buildC41Steps(){return[{name:'💧 Pre-Wash',time:60,tip:'Warm water at 102°F/39°C.',agitate:0},{name:'🧪 Developer',time:210,tip:'Maintain 102°F ±0.5°F.',agitate:30},{name:'⚗️ Blix',time:390,tip:'Combined bleach-fix. Agitate every 60s.',agitate:60},{name:'🚿 Wash',time:180,tip:'Running water 95-105°F.',agitate:0},{name:'✨ Stabilizer',time:60,tip:'Do not rinse after. Hang to dry.',agitate:0}];}
-function buildPrintSteps(){return[{name:'🧪 Developer',time:120,tip:'Rock tray gently corner-to-corner.',agitate:0},{name:'🛑 Stop Bath',time:30,tip:'Transfer quickly. 3-4 rocks.',agitate:0},{name:'🔧 Fixer',time:300,tip:'2-5 min fiber, 2 min RC paper.',agitate:60},{name:'🚿 Wash',time:600,tip:'RC: 5 min. Fiber: 20+ min.',agitate:0}];}
-function startProcess(){var dt=parseInt($('calcTime').dataset.seconds)||480;var steps=currentMode==='c41'?buildC41Steps():buildBWSteps(dt);var tot=steps.reduce(function(a,s){return a+s.time},0);timerState={steps:steps,current:0,remaining:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAgitate:0,lastTimestamp:0,transferCountdown:0};timerState.processInfo={mode:currentMode,film:getPickerVal('film'),dev:getPickerVal('dev'),devTime:dt};showPage('pageTimer');timerState.lastTimestamp=performance.now();tickTimer();}
-function startPrint(){var steps;if(printMode==='test'){var b=stepperVals.baseExp,n=stepperVals.strips;steps=[];for(var i=1;i<=n;i++)steps.push({name:'Strip '+i+' — '+b*i+'s',time:b,tip:i<n?'Cover next strip when done':'Last strip!',agitate:0});steps=steps.concat(buildPrintSteps());timerState.processInfo={mode:'print-test',base:b,strips:n};}else{var e=stepperVals.finalExp;steps=[{name:'Exposure',time:e,tip:'Hold still. Dodge and burn as planned.',agitate:0}].concat(buildPrintSteps());timerState.processInfo={mode:'print-final',exp:e};}var tot=steps.reduce(function(a,s){return a+s.time},0);timerState={steps:steps,current:0,remaining:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAgitate:0,lastTimestamp:0,transferCountdown:0};showPage('pageTimer');timerState.lastTimestamp=performance.now();tickTimer();}
+function adjVal(n,d){var l=stepperLimits[n];if(!l)return;stepperVals[n]=Math.max(l.min,Math.min(l.max,stepperVals[n]+d*l.step));var el=$(n+'Val');if(el)el.textContent=stepperVals[n];}
+
+function updateCalcTime(){tempVal=parseInt($('inpTemp').value)||68;
+var t=currentMode==='c41'?210:(function(){var f=$('selFilm').value,d=$('selDev').value;if(DEV_CHART[f]&&DEV_CHART[f][d])return DEV_CHART[f][d].t;return 480;})();
+var tf=tempVal;if(tempUnit==='C')tf=tf*9/5+32;
+t*=Math.pow(0.9,tf-68);if(pushStops>0)t*=Math.pow(1.3,pushStops);else if(pushStops<0)t*=Math.pow(0.8,Math.abs(pushStops));
+t=Math.max(60,Math.round(t));$('calcTime').textContent=fmt(t);$('calcTime').dataset.seconds=t;}
+
+function setPrintMode(m){printMode=m;$('btnTestStrip').classList.toggle('active',m==='test');$('btnFinalExp').classList.toggle('active',m==='final');
+$('testStripOpts').classList.toggle('hidden',m!=='test');$('finalExpOpts').classList.toggle('hidden',m!=='final');}
+
+// Analog Camera Audio Engine
+function initAudio(){
+  if(!audioCtx){audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
+  if(audioCtx.state==='suspended')audioCtx.resume();
+}
+// Unlock audio on first user interaction (required for iOS/Android)
+document.addEventListener('touchstart',function(){initAudio();},{once:true});
+document.addEventListener('click',function(){initAudio();},{once:true});
+
+// White noise buffer for mechanical sounds
+function noiseBuffer(dur){
+  initAudio();
+  var len=audioCtx.sampleRate*dur;
+  var buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate);
+  var data=buf.getChannelData(0);
+  for(var i=0;i<len;i++)data[i]=Math.random()*2-1;
+  return buf;
+}
+
+// Mechanical click — filtered noise burst (like a shutter)
+function clickSound(vol,freq,dur,delay){
+  initAudio();var t=audioCtx.currentTime+(delay||0);
+  var src=audioCtx.createBufferSource();src.buffer=noiseBuffer(dur||0.03);
+  var filt=audioCtx.createBiquadFilter();filt.type='bandpass';filt.frequency.value=freq||2000;filt.Q.value=8;
+  var gain=audioCtx.createGain();gain.gain.setValueAtTime(vol||0.3,t);
+  gain.gain.exponentialRampToValueAtTime(0.001,t+(dur||0.03));
+  src.connect(filt);filt.connect(gain);gain.connect(audioCtx.destination);
+  src.start(t);
+}
+
+// Shutter click — navigation sound
+function beepNav(){
+  clickSound(0.25,3000,0.015);
+}
+
+// Film advance ratchet — select/pinch
+function beepSelect(){
+  clickSound(0.3,2500,0.012);
+  clickSound(0.2,1800,0.015,0.04);
+}
+
+// Enlarger timer switch — timer step transition
+function beepTransition(){
+  clickSound(0.4,1200,0.025);
+  setTimeout(function(){
+    initAudio();var t=audioCtx.currentTime;
+    var o=audioCtx.createOscillator();var g=audioCtx.createGain();
+    o.type='triangle';o.frequency.value=800;
+    g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+    o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+0.15);
+  },60);
+}
+
+// Chemical tray tap — transfer alert
+function beepTransfer(){
+  for(var i=0;i<3;i++){
+    clickSound(0.35,1500,0.02,i*0.15);
+    (function(delay){setTimeout(function(){
+      initAudio();var t=audioCtx.currentTime;
+      var o=audioCtx.createOscillator();var g=audioCtx.createGain();
+      o.type='sine';o.frequency.setValueAtTime(1200,t);o.frequency.exponentialRampToValueAtTime(600,t+0.08);
+      g.gain.setValueAtTime(0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.08);
+      o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+0.1);
+    },delay);})(i*150);
+  }
+}
+
+// Film canister shake — agitate reminder
+function beepAgitate(){
+  for(var i=0;i<4;i++){clickSound(0.15,4000+Math.random()*2000,0.008,i*0.03);}
+}
+
+// Enlarger lamp + shutter sequence — process complete
+function beepComplete(){
+  initAudio();var t=audioCtx.currentTime;
+  // warm lamp hum
+  var o=audioCtx.createOscillator();var g=audioCtx.createGain();
+  o.type='sine';o.frequency.value=120;g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(0.06,t+0.1);g.gain.linearRampToValueAtTime(0.03,t+0.5);
+  g.gain.exponentialRampToValueAtTime(0.001,t+0.8);
+  o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+0.8);
+  // mechanical clicks
+  setTimeout(function(){clickSound(0.35,2000,0.02);},300);
+  setTimeout(function(){clickSound(0.3,2500,0.015);},450);
+  setTimeout(function(){clickSound(0.4,1800,0.025);},600);
+  // final satisfying clack
+  setTimeout(function(){
+    clickSound(0.5,1000,0.04);
+    initAudio();var t2=audioCtx.currentTime;
+    var o2=audioCtx.createOscillator();var g2=audioCtx.createGain();
+    o2.type='triangle';o2.frequency.value=600;
+    g2.gain.setValueAtTime(0.1,t2);g2.gain.exponentialRampToValueAtTime(0.001,t2+0.3);
+    o2.connect(g2);g2.connect(audioCtx.destination);o2.start(t2);o2.stop(t2+0.3);
+  },750);
+}
+
+// Film rewind — achievement unlock
+function beepAchievement(){
+  for(var i=0;i<6;i++){
+    clickSound(0.2,2000+i*400,0.01,i*0.06);
+  }
+  setTimeout(function(){
+    initAudio();var t=audioCtx.currentTime;
+    var o=audioCtx.createOscillator();var g=audioCtx.createGain();
+    o.type='triangle';o.frequency.setValueAtTime(500,t);
+    o.frequency.exponentialRampToValueAtTime(1200,t+0.3);
+    g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+    o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+0.4);
+  },400);
+}
+
+// Process steps
+var STEP_ICONS={'Pre-Wash':'💧','Developer':'🧪','Stop':'🛑','Fixer':'🔧','Wash':'🚿','Photo-Flo':'🫧','Blix':'⚗️','Stabilizer':'✨','Exposure':'💡','Rinse':'🛑'};
+function stepIcon(name){for(var k in STEP_ICONS)if(name.indexOf(k)!==-1)return STEP_ICONS[k];return '⏱';}
+
+function buildBWSteps(dt){return[{name:'Pre-Wash',time:60,tip:'Fill tank at dev temperature.',agitate:0},{name:'Developer',time:dt,tip:'Agitate gently first 30s. Then 5s every 30s.',agitate:30},{name:'Rinse',time:30,tip:'3-4 gentle inversions is enough.',agitate:0},{name:'Fixer',time:300,tip:'Under-fixing causes purple stains.',agitate:60},{name:'Wash',time:600,tip:'Running water or fill-and-dump 5x.',agitate:0},{name:'Photo-Flo',time:60,tip:'Do NOT agitate — let it sit perfectly still.',agitate:0}];}
+function buildC41Steps(){return[{name:'Pre-Wash',time:60,tip:'Warm water at 102°F / 39°C.',agitate:0},{name:'Developer',time:210,tip:'Maintain 102°F ±0.5°F.',agitate:30},{name:'Blix',time:390,tip:'Combined bleach-fix. Agitate every 60s.',agitate:60},{name:'Wash',time:180,tip:'Running water 95-105°F.',agitate:0},{name:'Stabilizer',time:60,tip:'Do not rinse after. Hang to dry.',agitate:0}];}
+function buildPrintSteps(){return[{name:'Developer',time:120,tip:'Rock tray gently corner-to-corner.',agitate:0},{name:'Rinse',time:30,tip:'Transfer quickly. 3-4 rocks.',agitate:0},{name:'Fixer',time:300,tip:'2-5 min fiber, 2 min RC paper.',agitate:60},{name:'Wash',time:600,tip:'RC: 5 min. Fiber: 20+ min.',agitate:0}];}
+
+function startProcess(){var dt=parseInt($('calcTime').dataset.seconds)||480;
+var steps=currentMode==='c41'?buildC41Steps():buildBWSteps(dt);
+var tot=steps.reduce(function(a,s){return a+s.time},0);
+ts={steps:steps,cur:0,rem:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:{mode:currentMode,film:$('selFilm').value,dev:$('selDev').value,devTime:dt}};
+showPage('pageTimer');ts.lastTs=performance.now();tickTimer();}
+
+function startPrint(){var steps;
+if(printMode==='test'){var b=stepperVals.baseExp,n=stepperVals.strips;steps=[];
+for(var i=1;i<=n;i++)steps.push({name:'Strip '+i+' ('+b*i+'s)',time:b,tip:i<n?'Cover next strip when done':'Last strip!',agitate:0});
+steps=steps.concat(buildPrintSteps());ts.info={mode:'print-test',base:b,strips:n};}
+else{var e=stepperVals.finalExp;steps=[{name:'Exposure',time:e,tip:'Hold still. Dodge and burn as planned.',agitate:0}].concat(buildPrintSteps());ts.info={mode:'print-final',exp:e};}
+var tot=steps.reduce(function(a,s){return a+s.time},0);
+ts={steps:steps,cur:0,rem:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:ts.info};
+showPage('pageTimer');ts.lastTs=performance.now();tickTimer();}
+
 function startFreeTimer(){showPage('pageFreeTimer');}
-function startFree(){var s=stepperVals.freeMin*60+stepperVals.freeSec;if(s<1)return;timerState={steps:[{name:'Free Timer',time:s,tip:'',agitate:0}],current:0,remaining:s,total:s,elapsed:0,running:true,paused:false,lastAgitate:0,lastTimestamp:0,transferCountdown:0};timerState.processInfo={mode:'free'};showPage('pageTimer');timerState.lastTimestamp=performance.now();tickTimer();}
-function tickTimer(){if(!timerState.running)return;var now=performance.now();if(!timerState.paused){var d=(now-timerState.lastTimestamp)/1000;timerState.remaining-=d;timerState.elapsed+=d;timerState.lastAgitate+=d;var step=timerState.steps[timerState.current];if(step.agitate>0&&timerState.lastAgitate>=step.agitate){timerState.lastAgitate=0;$('agitateInd').classList.add('active');beepAgitate();setTimeout(function(){$('agitateInd').classList.remove('active')},800);}if(timerState.remaining<=0){if(timerState.current<timerState.steps.length-1){if(timerState.transferCountdown===0){timerState.transferCountdown=3;timerState.remaining=3;$('transferAlert').classList.add('active');$('timerStepName').textContent='⚡ TRANSFER NOW';$('timerDisplay').style.color='#FF8C00';beepTransfer();}else{$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';timerState.transferCountdown=0;timerState.current++;var ns=timerState.steps[timerState.current];timerState.remaining=ns.time;timerState.lastAgitate=0;beepTransition();updateHearts();updateClothesline();}}else{finishProcess();return;}}}timerState.lastTimestamp=now;updateTimerUI();setTimeout(tickTimer,250);}
-function updateTimerUI(){var step=timerState.steps[timerState.current];if(timerState.transferCountdown===0)$('timerStepName').textContent=step.name;$('timerDisplay').textContent=fmt(Math.max(0,timerState.remaining));var te=timerState.steps.slice(0,timerState.current).reduce(function(a,s){return a+s.time},0)+(step.time-timerState.remaining);$('timerProgressFill').style.width=Math.min(100,(te/timerState.total)*100)+'%';if(timerState.current<timerState.steps.length-1){var ns=timerState.steps[timerState.current+1];$('timerNext').textContent='Next: '+ns.name+' — '+fmt(ns.time);}else $('timerNext').textContent='⭐ Final step!';$('timerTip').textContent=step.tip||'';$('agitateInd').style.display=step.agitate>0?'block':'none';}
-function buildHearts(){var h=$('heartsRow');h.innerHTML='';timerState.steps.forEach(function(){var s=document.createElement('span');s.className='heart';s.textContent='❤';h.appendChild(s);});updateHearts();}
-function updateHearts(){$('heartsRow').querySelectorAll('.heart').forEach(function(h,i){h.classList.toggle('filled',i<=timerState.current)})}
-function buildClothesline(){var c=$('clotheslinePrints');c.innerHTML='';var names={'Pre-Wash':'💧','Developer':'🧪','Stop':'🛑','Fixer':'🔧','Wash':'🚿','Photo-Flo':'🫧','Blix':'⚗️','Stabilizer':'✨','Exposure':'💡'};timerState.steps.forEach(function(s){var d=document.createElement('div');d.className='cl-print';var l=document.createElement('div');l.className='cl-print-label';var sn='';for(var k in names){if(s.name.indexOf(k)!==-1){sn=names[k];break;}}l.textContent=sn||s.name.charAt(0);d.appendChild(l);c.appendChild(d);});updateClothesline();}
-function updateClothesline(){$('clotheslinePrints').querySelectorAll('.cl-print').forEach(function(p,i){p.classList.remove('done','active');if(i<timerState.current)p.classList.add('done');else if(i===timerState.current)p.classList.add('active');});}
-function togglePause(){timerState.paused=!timerState.paused;$('btnPause').textContent=timerState.paused?'▶ Resume':'⏸ Pause';if(!timerState.paused)timerState.lastTimestamp=performance.now();}
-function skipStep(){if(timerState.current>=timerState.steps.length-1){finishProcess();return;}if(confirm('Skip '+timerState.steps[timerState.current].name+'?')){timerState.elapsed+=timerState.remaining;timerState.transferCountdown=0;$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';timerState.current++;timerState.remaining=timerState.steps[timerState.current].time;timerState.lastAgitate=0;beepTransition();updateHearts();updateClothesline();}}
-function showConfirm(msg,onYes){$('confirmMsg').textContent=msg;$('confirmModal').classList.remove('hidden');$('confirmYes').onclick=function(){$('confirmModal').classList.add('hidden');onYes();};$('confirmNo').onclick=function(){$('confirmModal').classList.add('hidden')};}
-var LEVELS=[{name:'Novice',xp:0},{name:'Apprentice',xp:50},{name:'Darkroom Tech',xp:150},{name:'Print Master',xp:300},{name:'Zone Guru',xp:500},{name:'Ansel Adams',xp:1000}];
+function startFree(){var s=stepperVals.freeMin*60+stepperVals.freeSec;if(s<1)return;
+ts={steps:[{name:'Free Timer',time:s,tip:'',agitate:0}],cur:0,rem:s,total:s,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:{mode:'free'}};
+showPage('pageTimer');ts.lastTs=performance.now();tickTimer();}
+
+function exitTimer(){showConfirm('Exit timer?',function(){ts.running=false;showPage('pageHome');});}
+
+// Timer
+function tickTimer(){if(!ts.running)return;var now=performance.now();
+if(!ts.paused){var d=(now-ts.lastTs)/1000;ts.rem-=d;ts.elapsed+=d;ts.lastAg+=d;
+var step=ts.steps[ts.cur];
+if(step.agitate>0&&ts.lastAg>=step.agitate){ts.lastAg=0;$('agitateInd').classList.add('active');beepAgitate();setTimeout(function(){$('agitateInd').classList.remove('active')},800);}
+if(ts.rem<=0){if(ts.cur<ts.steps.length-1){
+if(ts.xfer===0){ts.xfer=1;ts.rem=3;$('transferAlert').classList.add('active');$('timerStepName').textContent='⚡ TRANSFER NOW';$('timerDisplay').style.color='#FF4444';beepTransfer();}
+else{$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';ts.xfer=0;ts.cur++;ts.rem=ts.steps[ts.cur].time;ts.lastAg=0;beepTransition();updateHearts();updateClothesline();}}
+else{finishProcess();return;}}}
+ts.lastTs=now;updateTimerUI();setTimeout(tickTimer,250);}
+
+function updateTimerUI(){var step=ts.steps[ts.cur];
+if(ts.xfer===0)$('timerStepName').textContent=step.name;
+$('timerDisplay').textContent=fmt(Math.max(0,ts.rem));
+var te=ts.steps.slice(0,ts.cur).reduce(function(a,s){return a+s.time},0)+(step.time-ts.rem);
+$('timerProgressFill').style.width=Math.min(100,(te/ts.total)*100)+'%';
+if(ts.cur<ts.steps.length-1){var ns=ts.steps[ts.cur+1];$('timerNext').innerHTML='Up next <strong>'+ns.name+'</strong> '+fmt(ns.time);}
+else $('timerNext').innerHTML='⭐ <strong>Final step!</strong>';
+$('timerTip').textContent=step.tip||'';$('agitateInd').style.display=step.agitate>0?'block':'none';}
+
+function buildHearts(){var h=$('heartsRow');h.innerHTML='';ts.steps.forEach(function(){var s=document.createElement('span');s.className='timer-heart';s.textContent='❤';h.appendChild(s);});updateHearts();}
+function updateHearts(){$('heartsRow').querySelectorAll('.timer-heart').forEach(function(h,i){
+h.classList.remove('filled','active-heart');
+if(i<ts.cur)h.classList.add('filled');
+else if(i===ts.cur)h.classList.add('active-heart');
+})}
+
+function buildClothesline(){var c=$('clotheslinePrints');c.innerHTML='';
+ts.steps.forEach(function(s){
+var item=document.createElement('div');item.className='cl-item';
+var clip=document.createElement('div');clip.className='cl-clip';
+var photo=document.createElement('div');photo.className='cl-photo';
+var icon=document.createElement('span');icon.className='cl-step-icon';icon.textContent=stepIcon(s.name);
+photo.appendChild(icon);
+var label=document.createElement('div');label.className='cl-label';
+var short=s.name.replace('Pre-','').split(' ')[0].substring(0,4);
+label.textContent=short;
+item.appendChild(clip);item.appendChild(photo);item.appendChild(label);c.appendChild(item);
+});updateClothesline();}
+
+function updateClothesline(){var items=$('clotheslinePrints').querySelectorAll('.cl-item');
+items.forEach(function(p,i){p.classList.remove('done','active');if(i<ts.cur)p.classList.add('done');else if(i===ts.cur)p.classList.add('active');});}
+
+function togglePause(){ts.paused=!ts.paused;$('btnPause').textContent=ts.paused?'RESUME':'PAUSE';if(!ts.paused)ts.lastTs=performance.now();}
+function skipStep(){if(ts.cur>=ts.steps.length-1){finishProcess();return;}
+showConfirm('Skip '+ts.steps[ts.cur].name+'?',function(){ts.elapsed+=ts.rem;ts.xfer=0;
+$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';
+ts.cur++;ts.rem=ts.steps[ts.cur].time;ts.lastAg=0;beepTransition();updateHearts();updateClothesline();});}
+
+function showConfirm(msg,onYes,xpText){
+$('confirmMsg').textContent=msg;
+var xpEl=$('confirmXp');
+if(xpText){xpEl.textContent=xpText;xpEl.classList.add('visible');}
+else{xpEl.textContent='';xpEl.classList.remove('visible');}
+$('confirmModal').classList.remove('hidden');
+$('confirmYes').onclick=function(){$('confirmModal').classList.add('hidden');xpEl.classList.remove('visible');onYes();};
+$('confirmNo').onclick=function(){$('confirmModal').classList.add('hidden');xpEl.classList.remove('visible');};}
+
+// XP & Levels
+var LEVELS=[{name:'NOVICE',xp:0},{name:'APPRENTICE',xp:50},{name:'DARKROOM TECH',xp:150},{name:'PRINT MASTER',xp:300},{name:'ZONE GURU',xp:500},{name:'ANSEL ADAMS',xp:1000}];
 var XP_REWARDS={bw:25,c41:20,'print-test':15,'print-final':15,push:30,free:5};
 function getXP(){return parseInt(localStorage.getItem('db_xp')||'0');}
-function addXP(mode){var amt=XP_REWARDS[mode]||10;var xp=getXP()+amt;localStorage.setItem('db_xp',String(xp));updateXP();showAchievement('+ '+amt+' XP');var lvl=LEVELS.slice().reverse().find(function(l){return xp>=l.xp}),prev=LEVELS.slice().reverse().find(function(l){return(xp-amt)>=l.xp});if(lvl&&prev&&lvl.name!==prev.name)setTimeout(function(){showAchievement('⬆ LEVEL UP: '+lvl.name+'!');beepComplete();},1500);}
-function updateXP(){var xp=getXP();$('scoreVal').textContent=xp;var lvl=LEVELS.slice().reverse().find(function(l){return xp>=l.xp})||LEVELS[0];var next=LEVELS[LEVELS.indexOf(lvl)+1];$('levelLabel').textContent=lvl.name;if(next)$('xpFill').style.width=((xp-lvl.xp)/(next.xp-lvl.xp))*100+'%';else $('xpFill').style.width='100%';}
-function showAchievement(t){var d=document.createElement('div');d.className='achievement';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},2500);}
-function finishProcess(){timerState.running=false;$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';beepComplete();updateHearts();updateClothesline();var info=timerState.processInfo||{};addXP(info.mode||'free');var entry={date:new Date().toISOString(),mode:info.mode||'unknown',film:info.film||'',dev:info.dev||'',devTime:info.devTime||0,totalElapsed:Math.round(timerState.elapsed)};var log=JSON.parse(localStorage.getItem('db_log')||'[]');log.unshift(entry);localStorage.setItem('db_log',JSON.stringify(log));checkNewBadges();showConfirm('🎉 Process complete! Return home?',function(){showPage('pageHome')});}
-var BADGES=[{id:'first_roll',cat:'film',icon:'🎞',name:'First Roll',desc:'Develop 1 roll',check:function(s){return s.bw+s.c41+s.push>=1},need:1,countFn:function(s){return s.bw+s.c41+s.push}},{id:'five_rolls',cat:'film',icon:'🎬',name:'Five Rolls',desc:'Develop 5 rolls',check:function(s){return s.bw+s.c41+s.push>=5},need:5,countFn:function(s){return s.bw+s.c41+s.push}},{id:'ten_rolls',cat:'film',icon:'📷',name:'Ten Rolls',desc:'Develop 10 rolls',check:function(s){return s.bw+s.c41+s.push>=10},need:10,countFn:function(s){return s.bw+s.c41+s.push}},{id:'bw_master',cat:'film',icon:'⬛',name:'B&W Master',desc:'10 B&W rolls',check:function(s){return s.bw>=10},need:10,countFn:function(s){return s.bw}},{id:'color_fan',cat:'film',icon:'🌈',name:'Color Fan',desc:'5 C-41 rolls',check:function(s){return s.c41>=5},need:5,countFn:function(s){return s.c41}},{id:'pusher',cat:'film',icon:'⬆',name:'Pusher',desc:'3 push/pull',check:function(s){return s.push>=3},need:3,countFn:function(s){return s.push}},{id:'first_print',cat:'print',icon:'🖼',name:'First Print',desc:'Make 1 print',check:function(s){return s.prints>=1},need:1,countFn:function(s){return s.prints}},{id:'test_pro',cat:'print',icon:'🔬',name:'Test Pro',desc:'5 test strips',check:function(s){return s.tests>=5},need:5,countFn:function(s){return s.tests}},{id:'edition',cat:'print',icon:'🎨',name:'Edition',desc:'10 prints',check:function(s){return s.prints>=10},need:10,countFn:function(s){return s.prints}},{id:'night_owl',cat:'mastery',icon:'🦉',name:'Night Owl',desc:'5 sessions',check:function(s){return s.total>=5},need:5,countFn:function(s){return s.total}},{id:'dedicated',cat:'mastery',icon:'🔥',name:'Dedicated',desc:'25 sessions',check:function(s){return s.total>=25},need:25,countFn:function(s){return s.total}},{id:'darkroom_rat',cat:'mastery',icon:'🐀',name:'Darkroom Rat',desc:'50 sessions',check:function(s){return s.total>=50},need:50,countFn:function(s){return s.total}}];
-function getStats(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');var s={bw:0,c41:0,push:0,prints:0,tests:0,free:0,total:log.length};log.forEach(function(e){if(e.mode==='bw')s.bw++;else if(e.mode==='c41')s.c41++;else if(e.mode==='push')s.push++;else if(e.mode==='print-final')s.prints++;else if(e.mode==='print-test')s.tests++;else s.free++;});return s;}
-function renderBadges(){var st=getStats();var ul=JSON.parse(localStorage.getItem('db_badges')||'[]');['film','print','mastery'].forEach(function(cat){var c=$(cat==='film'?'filmBadges':cat==='print'?'printBadges':'masteryBadges');c.innerHTML='';BADGES.filter(function(b){return b.cat===cat}).forEach(function(b){var u=b.check(st);if(u&&ul.indexOf(b.id)===-1){ul.push(b.id);localStorage.setItem('db_badges',JSON.stringify(ul));}var cnt=b.countFn(st),pct=Math.min(100,(cnt/b.need)*100);c.innerHTML+='<div class="badge '+(u?'unlocked':'locked')+'"><span class="badge-icon">'+(u?b.icon:'🔒')+'</span><span class="badge-name">'+b.name+'</span><span class="badge-desc">'+b.desc+'</span><div class="badge-progress"><div class="badge-progress-fill" style="width:'+pct+'%"></div></div></div>';});});var xp=getXP(),lvl=LEVELS.slice().reverse().find(function(l){return xp>=l.xp})||LEVELS[0],next=LEVELS[LEVELS.indexOf(lvl)+1];$('badgeLevelLabel').textContent=lvl.name;$('badgeXpFill').style.width=next?((xp-lvl.xp)/(next.xp-lvl.xp))*100+'%':'100%';}
-function checkNewBadges(){var st=getStats(),ul=JSON.parse(localStorage.getItem('db_badges')||'[]');BADGES.forEach(function(b){if(b.check(st)&&ul.indexOf(b.id)===-1){ul.push(b.id);localStorage.setItem('db_badges',JSON.stringify(ul));setTimeout(function(){showAchievement('🏆 '+b.name+' unlocked!')},2000);}});}
-function renderLog(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');var el=$('logEntries');if(!log.length){el.innerHTML='<p style="color:var(--dim)">No sessions yet. Complete a process to earn XP!</p>';return;}el.innerHTML=log.map(function(e){var d=new Date(e.date);var label=e.mode==='bw'?'B&W':e.mode==='c41'?'C-41':e.mode==='print-test'?'Print (Test)':e.mode==='print-final'?'Print':'Free Timer';var xp=XP_REWARDS[e.mode]||10;return'<div class="log-entry"><div class="log-date">'+d.toLocaleDateString()+' +'+xp+' XP</div><strong>'+label+'</strong>'+(e.film?' — '+e.film:'')+(e.dev?' in '+e.dev:'')+'<div class="log-detail">Total: '+fmt(e.totalElapsed)+'</div></div>';}).join('');}
-function exportLog(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');if(!log.length)return;var txt='DARKROOM BUDDY LOG\n==============================\nXP: '+getXP()+'\n\n';log.forEach(function(e){txt+=new Date(e.date).toLocaleString()+'\n'+e.mode+' | '+(e.film||'N/A')+' | '+fmt(e.totalElapsed)+'\n\n';});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.download='darkroom-buddy-log.txt';a.click();}
-function clearAll(){showConfirm('Clear all data?',function(){localStorage.removeItem('db_log');localStorage.removeItem('db_xp');localStorage.removeItem('db_badges');renderLog();updateXP();});}
+function addXP(mode){var amt=XP_REWARDS[mode]||10;var xp=getXP()+amt;localStorage.setItem('db_xp',String(xp));updateXP();}
+
+function updateXP(){var xp=getXP();$('scoreVal').textContent=xp;
+var lvl=LEVELS.slice().reverse().find(function(l){return xp>=l.xp})||LEVELS[0];
+var next=LEVELS[LEVELS.indexOf(lvl)+1];
+$('levelLabel').textContent=lvl.name;
+if(next)$('xpFill').style.width=((xp-lvl.xp)/(next.xp-lvl.xp))*100+'%';
+else $('xpFill').style.width='100%';}
+
+function showAchievement(t){var d=document.createElement('div');d.className='achievement-toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove()},2500);}
+
+function finishProcess(){ts.running=false;$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';
+beepComplete();updateHearts();updateClothesline();
+var info=ts.info||{};
+var mode=info.mode||'free';
+var amt=XP_REWARDS[mode]||10;
+var xp=getXP()+amt;localStorage.setItem('db_xp',String(xp));updateXP();
+var entry={date:new Date().toISOString(),mode:info.mode||'unknown',film:info.film||'',dev:info.dev||'',devTime:info.devTime||0,totalElapsed:Math.round(ts.elapsed)};
+var log=JSON.parse(localStorage.getItem('db_log')||'[]');log.unshift(entry);localStorage.setItem('db_log',JSON.stringify(log));
+checkNewBadges();
+var lvl=LEVELS.slice().reverse().find(function(l){return xp>=l.xp});
+var prev=LEVELS.slice().reverse().find(function(l){return(xp-amt)>=l.xp});
+var lvlMsg=lvl&&prev&&lvl.name!==prev.name?'\nLEVEL UP: '+lvl.name+'!':'';
+showConfirm('Process complete!'+lvlMsg,function(){showPage('pageHome');},'+ '+amt+' XP');}
+
+// Badges
+var BADGES=[
+{id:'first_roll',cat:'film',icon:'📷',name:'FIRST ROLL',desc:'Develop 1 roll',check:function(s){return s.bw+s.c41+s.push>=1},need:1,countFn:function(s){return s.bw+s.c41+s.push}},
+{id:'five_rolls',cat:'film',icon:'🎬',name:'FIVE ROLLS',desc:'Develop 5 rolls',check:function(s){return s.bw+s.c41+s.push>=5},need:5,countFn:function(s){return s.bw+s.c41+s.push}},
+{id:'ten_rolls',cat:'film',icon:'📷',name:'TEN ROLLS',desc:'Develop 10 rolls',check:function(s){return s.bw+s.c41+s.push>=10},need:10,countFn:function(s){return s.bw+s.c41+s.push}},
+{id:'bw_master',cat:'film',icon:'⬛',name:'B&W MASTER',desc:'10 B&W rolls',check:function(s){return s.bw>=10},need:10,countFn:function(s){return s.bw}},
+{id:'color_fan',cat:'film',icon:'🌈',name:'COLOR FAN',desc:'5 C-41 rolls',check:function(s){return s.c41>=5},need:5,countFn:function(s){return s.c41}},
+{id:'pusher',cat:'film',icon:'⬆',name:'PUSHER',desc:'3 push/pull',check:function(s){return s.push>=3},need:3,countFn:function(s){return s.push}},
+{id:'first_print',cat:'print',icon:'🖨',name:'FIRST PRINT',desc:'Make 1 print',check:function(s){return s.prints>=1},need:1,countFn:function(s){return s.prints}},
+{id:'test_pro',cat:'print',icon:'🔬',name:'TEST PRO',desc:'5 test strips',check:function(s){return s.tests>=5},need:5,countFn:function(s){return s.tests}},
+{id:'edition',cat:'print',icon:'🎨',name:'EDITION',desc:'10 prints',check:function(s){return s.prints>=10},need:10,countFn:function(s){return s.prints}},
+{id:'night_owl',cat:'mastery',icon:'🦉',name:'NIGHT OWL',desc:'5 sessions',check:function(s){return s.total>=5},need:5,countFn:function(s){return s.total}},
+{id:'dedicated',cat:'mastery',icon:'🔥',name:'DEDICATED',desc:'25 sessions',check:function(s){return s.total>=25},need:25,countFn:function(s){return s.total}},
+{id:'darkroom_rat',cat:'mastery',icon:'🐀',name:'DARKROOM RAT',desc:'50 sessions',check:function(s){return s.total>=50},need:50,countFn:function(s){return s.total}}
+];
+
+function getStats(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');
+var s={bw:0,c41:0,push:0,prints:0,tests:0,free:0,total:log.length};
+log.forEach(function(e){if(e.mode==='bw')s.bw++;else if(e.mode==='c41')s.c41++;else if(e.mode==='push')s.push++;else if(e.mode==='print-final')s.prints++;else if(e.mode==='print-test')s.tests++;else s.free++;});return s;}
+
+function renderBadges(){var st=getStats();var ul=JSON.parse(localStorage.getItem('db_badges')||'[]');
+['film','print','mastery'].forEach(function(cat){
+var c=$(cat==='film'?'filmBadges':cat==='print'?'printBadges':'masteryBadges');c.innerHTML='';
+BADGES.filter(function(b){return b.cat===cat}).forEach(function(b){
+var u=b.check(st);if(u&&ul.indexOf(b.id)===-1){ul.push(b.id);localStorage.setItem('db_badges',JSON.stringify(ul));}
+var cnt=b.countFn(st),pct=Math.min(100,(cnt/b.need)*100);
+c.innerHTML+='<div class="badge-card '+(u?'unlocked':'locked')+'">'+
+'<span class="badge-card-icon">'+(u?b.icon:'🔒')+'</span>'+
+'<span class="badge-card-name">'+b.name+'</span>'+
+'<span class="badge-card-desc">'+b.desc+'</span>'+
+'<div class="badge-card-progress"><div class="badge-card-progress-fill" style="width:'+pct+'%"></div></div>'+
+'<span class="badge-card-count">'+cnt+'/'+b.need+'</span></div>';
+});});
+var xp=getXP(),lvl=LEVELS.slice().reverse().find(function(l){return xp>=l.xp})||LEVELS[0],next=LEVELS[LEVELS.indexOf(lvl)+1];
+$('badgeLevelLabel').textContent=lvl.name;
+$('badgeXpFill').style.width=next?((xp-lvl.xp)/(next.xp-lvl.xp))*100+'%':'100%';}
+
+function checkNewBadges(){var st=getStats(),ul=JSON.parse(localStorage.getItem('db_badges')||'[]');
+BADGES.forEach(function(b){if(b.check(st)&&ul.indexOf(b.id)===-1){ul.push(b.id);localStorage.setItem('db_badges',JSON.stringify(ul));
+setTimeout(function(){showAchievement('🏆 '+b.name+' UNLOCKED!');beepAchievement();},2000);}});}
+
+// Log
+function renderLog(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');var el=$('logEntries');
+if(!log.length){el.innerHTML='<p style="color:var(--dim);font-size:.4rem;text-align:center;margin:20px 0">No sessions yet. Complete a process to earn XP!</p>';return;}
+el.innerHTML=log.map(function(e){var d=new Date(e.date);
+var label=e.mode==='bw'?'B&W':e.mode==='c41'?'C-41':e.mode==='print-test'?'Print (Test)':e.mode==='print-final'?'Print':'Free Timer';
+var xp=XP_REWARDS[e.mode]||10;
+return'<div class="log-entry"><span class="log-date">'+d.toLocaleDateString()+' +'+xp+' XP</span>'+
+'<span class="log-mode">'+label+(e.film?' — '+e.film:'')+'</span>'+
+'<span class="log-detail">Duration: '+fmt(e.totalElapsed)+(e.dev?' | '+e.dev:'')+'</span></div>';}).join('');}
+
+function exportLog(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');if(!log.length)return;
+var txt='DARKROOM BUDDY LOG\n==============================\nXP: '+getXP()+'\n\n';
+log.forEach(function(e){txt+=new Date(e.date).toLocaleString()+'\n'+e.mode+' | '+(e.film||'N/A')+' | '+fmt(e.totalElapsed)+'\n\n';});
+var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));a.download='darkroom-buddy-log.txt';a.click();}
+
+function clearAll(){showConfirm('Clear all data? This cannot be undone.',function(){
+localStorage.removeItem('db_log');localStorage.removeItem('db_xp');localStorage.removeItem('db_badges');
+renderLog();updateXP();showAchievement('Data cleared');});}
+
+// Init
 renderLog();updateXP();
+
 </script>
 </body>
 </html>

@@ -410,15 +410,22 @@ function focusFirst(container){
 var lastEnterTime=0;
 var ENTER_DEBOUNCE=400;
 
+// Debug: show what input events the browser actually sends
+var debugEl=document.createElement('div');
+debugEl.style.cssText='position:fixed;bottom:4px;left:4px;color:#FF8C00;font-size:10px;z-index:9999;opacity:0.7;font-family:monospace';
+debugEl.textContent='input: waiting...';
+document.body.appendChild(debugEl);
+function debugInput(msg){debugEl.textContent='input: '+msg;setTimeout(function(){debugEl.textContent='input: waiting...';},2000);}
+
+// Listen for ALL possible input events
 document.addEventListener('keydown',function(e){
+  debugInput('key: '+e.key+' ('+e.keyCode+')');
   switch(e.key){
-    case 'ArrowUp':
-    case 'ArrowLeft':
+    case 'ArrowUp':case 'ArrowLeft':
       moveFocus('up');beepNav();e.preventDefault();break;
-    case 'ArrowDown':
-    case 'ArrowRight':
+    case 'ArrowDown':case 'ArrowRight':
       moveFocus('down');beepNav();e.preventDefault();break;
-    case 'Enter':
+    case 'Enter':case ' ':
       var now=Date.now();
       if(now-lastEnterTime<ENTER_DEBOUNCE){e.preventDefault();break;}
       lastEnterTime=now;
@@ -426,9 +433,29 @@ document.addEventListener('keydown',function(e){
         document.activeElement.click();
       }
       e.preventDefault();break;
-    case 'Escape':showScreen('home');e.preventDefault();break;
+    case 'Escape':case 'Backspace':
+      showScreen('home');e.preventDefault();break;
+    default:
+      // Catch numeric keycodes that some browsers send instead of named keys
+      if(e.keyCode===38||e.keyCode===37){moveFocus('up');beepNav();e.preventDefault();}
+      else if(e.keyCode===40||e.keyCode===39){moveFocus('down');beepNav();e.preventDefault();}
+      else if(e.keyCode===13||e.keyCode===32){
+        var now2=Date.now();if(now2-lastEnterTime<ENTER_DEBOUNCE)break;lastEnterTime=now2;
+        if(document.activeElement&&document.activeElement.classList.contains('focusable'))document.activeElement.click();
+        e.preventDefault();
+      }
+      break;
   }
-});
+},true); // Use capture phase to intercept before browser
+
+// Also listen on window in case document doesn't get events
+window.addEventListener('keydown',function(e){
+  debugInput('win-key: '+e.key+' ('+e.keyCode+')');
+},true);
+
+// Log pointer events to debug cursor behavior
+document.addEventListener('pointerdown',function(e){debugInput('ptr: '+Math.round(e.clientX)+','+Math.round(e.clientY));});
+document.addEventListener('mousedown',function(e){debugInput('mouse: '+Math.round(e.clientX)+','+Math.round(e.clientY));});
 
 updateXP();
 setTimeout(function(){focusFirst($('home'));},100);

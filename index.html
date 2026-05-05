@@ -341,22 +341,19 @@ border-radius:8px;color:var(--amber);font-size:1rem;display:flex;align-items:cen
 <button class="back-arrow" onclick="beepNav();showPage('pageHome')">←</button>
 <div class="setup-title" id="setupTitle">B&W FILM DEVELOPMENT</div>
 
-<div id="setupFilm">
-<span class="form-label">FILM</span>
-<select class="picker-select" id="selFilm" onchange="updateCalcTime()"></select>
+<div id="setupFilm" class="form-group">
+<div class="emg-picker"><span class="pick-label">Film</span><button class="pick-prev" onclick="beepNav();pickPrev('film')">&#9664;</button><span class="pick-val" id="filmPickVal">—</span><button class="pick-next" onclick="beepNav();pickNext('film')">&#9654;</button></div>
 </div>
-<div id="setupDev">
-<span class="form-label">DEVELOPER</span>
-<select class="picker-select" id="selDev" onchange="updateCalcTime()"></select>
+<div id="setupDev" class="form-group">
+<div class="emg-picker"><span class="pick-label">Dev</span><button class="pick-prev" onclick="beepNav();pickPrev('dev')">&#9664;</button><span class="pick-val" id="devPickVal">—</span><button class="pick-next" onclick="beepNav();pickNext('dev')">&#9654;</button></div>
 </div>
-<div id="setupDilution">
-<span class="form-label">DILUTION</span>
-<select class="picker-select" id="selDilution" onchange="updateCalcTime()"></select>
+<div id="setupDilution" class="form-group">
+<div class="emg-picker"><span class="pick-label">Dilution</span><button class="pick-prev" onclick="beepNav();pickPrev('dil')">&#9664;</button><span class="pick-val" id="dilPickVal">—</span><button class="pick-next" onclick="beepNav();pickNext('dil')">&#9654;</button></div>
 </div>
 
-<div class="temp-row">
-<input type="number" class="temp-val" id="inpTemp" value="68" onchange="updateCalcTime()">
-<div class="temp-toggle">
+<div class="form-group">
+<div class="emg-picker"><span class="pick-label">Temp</span><button class="pick-prev" onclick="beepNav();adjTemp(-1)">&#9664;</button><span class="pick-val" id="tempDisplay">68°F</span><button class="pick-next" onclick="beepNav();adjTemp(1)">&#9654;</button></div>
+<div class="temp-toggle" style="margin-top:6px">
 <button class="active" id="btnF" onclick="setTempUnit('F')">F</button>
 <button id="btnC" onclick="setTempUnit('C')">C</button>
 </div>
@@ -517,21 +514,23 @@ function showPage(id){document.querySelectorAll('.page').forEach(function(p){p.c
 function showSetup(m){currentMode=m;if(m==='print'){showPage('pagePrintSetup');return;}
 showPage('pageSetup');var c41=m==='c41';
 $('setupTitle').textContent=m==='bw'?'B&W FILM DEVELOPMENT':c41?'C-41 COLOR DEVELOPMENT':'PUSH/PULL PROCESSING';
-var sf=$('selFilm');sf.innerHTML='';(c41?C41_FILMS:FILMS).forEach(function(f){var o=document.createElement('option');o.value=f;o.textContent=f;sf.appendChild(o);});
-var sd=$('selDev');sd.innerHTML='';(c41?['C-41 Kit']:DEVS).forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;sd.appendChild(o);});
+if(c41){pickers.film.items=C41_FILMS;pickers.dev.items=['C-41 Kit'];}
+else{pickers.film.items=FILMS;pickers.dev.items=DEVS;}
+pickers.film.idx=0;pickers.dev.idx=0;pickers.dil.idx=0;
+updatePickerDisplay('film');updatePickerDisplay('dev');updatePickerDisplay('dil');
 $('setupDilution').classList.toggle('hidden',c41);
-if(!c41){var sdil=$('selDilution');sdil.innerHTML='';DILUTIONS.forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;sdil.appendChild(o);});}
 pushStops=0;$('pushVal').textContent='0';$('setupPush').classList.toggle('hidden',c41);
-$('inpTemp').value=tempVal;updateCalcTime();}
+$('tempDisplay').textContent=tempVal+'°'+tempUnit;updateCalcTime();}
 
 function setTempUnit(u){tempUnit=u;$('btnF').classList.toggle('active',u==='F');$('btnC').classList.toggle('active',u==='C');
 if(u==='C')tempVal=Math.round((tempVal-32)*5/9);else tempVal=Math.round(tempVal*9/5+32);
-$('inpTemp').value=tempVal;updateCalcTime();}
+$('tempDisplay').textContent=tempVal+'°'+tempUnit;updateCalcTime();}
 function adjPush(d){pushStops=Math.max(-3,Math.min(3,pushStops+d));$('pushVal').textContent=(pushStops>0?'+':'')+pushStops;updateCalcTime();}
 function adjVal(n,d){var l=stepperLimits[n];if(!l)return;stepperVals[n]=Math.max(l.min,Math.min(l.max,stepperVals[n]+d*l.step));var el=$(n+'Val');if(el)el.textContent=stepperVals[n];}
 
-function updateCalcTime(){tempVal=parseInt($('inpTemp').value)||68;
-var t=currentMode==='c41'?210:(function(){var f=$('selFilm').value,d=$('selDev').value;if(DEV_CHART[f]&&DEV_CHART[f][d])return DEV_CHART[f][d].t;return 480;})();
+function adjTemp(d){tempVal+=d;$('tempDisplay').textContent=tempVal+'°'+tempUnit;updateCalcTime();}
+function updateCalcTime(){
+var t=currentMode==='c41'?210:(function(){var f=getPickerVal('film'),d=getPickerVal('dev');if(DEV_CHART[f]&&DEV_CHART[f][d])return DEV_CHART[f][d].t;return 480;})();
 var tf=tempVal;if(tempUnit==='C')tf=tf*9/5+32;
 t*=Math.pow(0.9,tf-68);if(pushStops>0)t*=Math.pow(1.3,pushStops);else if(pushStops<0)t*=Math.pow(0.8,Math.abs(pushStops));
 t=Math.max(60,Math.round(t));$('calcTime').textContent=fmt(t);$('calcTime').dataset.seconds=t;}
@@ -661,7 +660,7 @@ function buildPrintSteps(){return[{name:'Developer',time:120,tip:'Rock tray gent
 function startProcess(){var dt=parseInt($('calcTime').dataset.seconds)||480;
 var steps=currentMode==='c41'?buildC41Steps():buildBWSteps(dt);
 var tot=steps.reduce(function(a,s){return a+s.time},0);
-ts={steps:steps,cur:0,rem:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:{mode:currentMode,film:$('selFilm').value,dev:$('selDev').value,devTime:dt}};
+ts={steps:steps,cur:0,rem:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:{mode:currentMode,film:getPickerVal('film'),dev:getPickerVal('dev'),devTime:dt}};
 showPage('pageTimer');ts.lastTs=performance.now();tickTimer();}
 
 function startPrint(){var steps;

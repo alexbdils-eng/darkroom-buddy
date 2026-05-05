@@ -941,8 +941,10 @@ function getInteractiveElements(){
   if(!$('confirmModal').classList.contains('hidden')){
     return Array.from($('confirmModal').querySelectorAll('button'));
   }
-  var els=Array.from(page.querySelectorAll('button,select,input,.card,.nav-full'));
-  return els.filter(function(e){return e.offsetParent!==null&&!e.disabled&&!e.closest('.hidden')&&e.offsetHeight>0;});
+  var els=Array.from(page.querySelectorAll('button,select,input,.card,.nav-full,[tabindex="0"],.focusable'));
+  // Deduplicate (elements might match multiple selectors)
+  var seen=new Set();
+  els=els.filter(function(e){if(seen.has(e))return false;seen.add(e);return e.offsetParent!==null&&!e.disabled&&!e.closest('.hidden')&&e.offsetHeight>0;});
 }
 
 var currentFocus=-1;

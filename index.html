@@ -215,9 +215,9 @@ margin:0 auto 6px;opacity:.4}
 /* === CHEMISTRY REFERENCE === */
 .ref-title{font-size:1rem;color:var(--amber);letter-spacing:2px;margin:8px 0 16px;padding-top:30px}
 .ref-card{background:var(--surface);border:2px solid var(--border);border-left:4px solid var(--amber);
-border-radius:8px;padding:16px;margin-bottom:10px;position:relative}
-.ref-card h3{font-size:.85rem;color:var(--amber);letter-spacing:2px;margin-bottom:10px}
-.ref-card p{font-size:.7rem;color:var(--dim);line-height:2.2;font-family:var(--sans)}
+border-radius:8px;padding:20px;margin-bottom:14px;position:relative}
+.ref-card h3{font-size:1rem;color:var(--amber);letter-spacing:2px;margin-bottom:12px}
+.ref-card p{font-size:.85rem;color:#E4E6EB;line-height:2.4;font-family:var(--sans)}
 .ref-icon{font-size:.7rem;margin-left:4px;vertical-align:baseline}
 
 /* === BADGES/ACHIEVEMENTS === */
@@ -296,6 +296,25 @@ border-radius:18px;animation:achieveRing 1s ease-out forwards;pointer-events:non
 border-radius:8px;color:var(--amber);font-size:1rem;display:flex;align-items:center;justify-content:center}
 .free-stepper button:active{background:var(--amber);color:#000}
 .free-stepper .free-val{flex:1;text-align:center;font-size:.8rem;color:var(--gold)}
+
+/* === GLASSES PERFORMANCE MODE === */
+/* Targets 600x600 square viewport — kills animations, shadows, gradients for ODC recording */
+@media(max-width:600px) and (max-height:600px){
+*{animation:none!important;transition:none!important}
+*::before,*::after{animation:none!important}
+.card,.card-bw,.card-c41,.card-print,.card-push,.card-timer,.card-badges{
+background:var(--surface)!important;box-shadow:none!important}
+.focusable:focus,.cycle-picker:focus{box-shadow:none!important}
+.timer-big,.lcd-time,.home-title .title-top,.home-title .title-bot{text-shadow:none!important}
+.achievement-toast,.confirm-xp{text-shadow:none!important}
+.xp-fill::after{display:none!important}
+.cl-item.done .cl-photo,.cl-item.active .cl-photo{box-shadow:none!important}
+.badge-card.unlocked{box-shadow:none!important}
+.start-btn{box-shadow:none!important}
+.nav-full,.ref-card,.log-entry,.badge-card,.confirm-box,.overlay-content{box-shadow:none!important}
+.lcd-display{box-shadow:none!important}
+body{font-family:monospace!important}
+}
 </style>
 </head>
 <body>
@@ -709,7 +728,7 @@ if(ts.rem<=0){if(ts.cur<ts.steps.length-1){
 if(ts.xfer===0){ts.xfer=1;ts.rem=3;$('transferAlert').classList.add('active');$('timerStepName').textContent='⚡ TRANSFER NOW';$('timerDisplay').style.color='#FF4444';beepTransfer();}
 else{$('transferAlert').classList.remove('active');$('timerDisplay').style.color='';ts.xfer=0;ts.cur++;ts.rem=ts.steps[ts.cur].time;ts.lastAg=0;beepTransition();updateHearts();updateClothesline();}}
 else{finishProcess();return;}}}
-ts.lastTs=now;updateTimerUI();setTimeout(tickTimer,250);}
+ts.lastTs=now;updateTimerUI();var isGlasses=window.innerWidth<=600&&window.innerHeight<=600;setTimeout(tickTimer,isGlasses?500:250);}
 
 function updateTimerUI(){var step=ts.steps[ts.cur];
 if(ts.xfer===0)$('timerStepName').textContent=step.name;

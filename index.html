@@ -882,7 +882,7 @@ var c=$(cat==='film'?'filmBadges':cat==='print'?'printBadges':'masteryBadges');c
 BADGES.filter(function(b){return b.cat===cat}).forEach(function(b){
 var u=b.check(st);if(u&&ul.indexOf(b.id)===-1){ul.push(b.id);localStorage.setItem('db_badges',JSON.stringify(ul));}
 var cnt=b.countFn(st),pct=Math.min(100,(cnt/b.need)*100);
-c.innerHTML+='<div class="badge-card '+(u?'unlocked':'locked')+'">'+
+c.innerHTML+='<div class="badge-card focusable '+(u?'unlocked':'locked')+'" tabindex="0">'+
 '<span class="badge-card-icon">'+(u?b.icon:'🔒')+'</span>'+
 '<span class="badge-card-name">'+b.name+'</span>'+
 '<span class="badge-card-desc">'+b.desc+'</span>'+

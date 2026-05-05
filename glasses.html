@@ -1,465 +1,987 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
-<title>Darkroom Buddy</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#1C1E21;--bg2:#2a2520;--bg3:#3a3020;--border:#4a3a2a;
-  --text:#FFFFFF;--text2:#E4E6EB;--text3:#B0B3B8;
-  --amber:#FF8C00;--red:#D43030;--gold:#FFD700;
-  --focus-ring:#FF8C00;--focus-glow:rgba(255,140,0,0.4);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
+  <title>Darkroom Buddy</title>
+  <style>
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #14141f;
+  --bg-tertiary: #1e1e2e;
+  --bg-card: #1a1a2e;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+  --accent-primary: #FF8C00;
+  --accent-secondary: #FFD700;
+  --accent-warm: #ff9f43;
+  --danger: #D43030;
+  --focus-ring: #FF8C00;
+  --focus-glow: rgba(255, 140, 0, 0.4);
+  --success: #00ff88;
+  --warning: #ffaa00;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{width:600px;height:600px;overflow:hidden;background:var(--bg);color:var(--text);
-font-family:'Press Start 2P',monospace}
-#app{width:600px;height:600px;padding:8px;position:relative}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+}
+
+#app { width: 100%; height: 100%; position: relative; }
 
 /* Screens */
-.screen{width:100%;height:100%;display:flex;flex-direction:column;position:absolute;top:0;left:0;padding:8px}
-.screen.hidden{display:none}
+.screen {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  position: absolute; top: 0; left: 0;
+}
+.screen.hidden { display: none; }
 
 /* Header */
-.header{display:flex;align-items:center;padding:8px 12px;gap:12px;flex-shrink:0}
-.header h1{font-size:16px;font-weight:700;flex:1;color:var(--amber)}
-.header-meta{font-size:14px;color:var(--gold)}
-.back-btn{background:transparent;color:var(--text);font-size:22px;padding:8px 12px;border-radius:8px;border:2px solid transparent;min-height:44px}
-
-/* Focusable elements — official interaction states */
-.focusable{
-  transition:transform 475ms cubic-bezier(0.6,0,0.4,1),opacity 300ms cubic-bezier(0.4,0.04,0.5,1);
-  border:2px solid transparent;opacity:0.85;min-height:88px;cursor:pointer}
-.focusable .content{opacity:0.8;transition:opacity 300ms cubic-bezier(0.4,0.04,0.5,1)}
-.focusable:focus{outline:none;border-color:var(--focus-ring);box-shadow:0 0 20px var(--focus-glow);opacity:1}
-.focusable:focus .content{opacity:1}
-.focusable:active{transform:scale(0.97);transition:transform 100ms cubic-bezier(0.68,0,0.29,1)}
-
-/* Nav bar */
-.nav-bar{display:flex;gap:8px;padding:8px 0;flex-shrink:0}
-.nav-item{flex:1;padding:14px;background:var(--bg2);border-radius:12px;color:var(--text);font-size:14px;
-font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px}
-.nav-item.primary{background:var(--amber);color:var(--bg)}
-.nav-item.danger{background:var(--red);color:#fff}
+.header {
+  display: flex; align-items: center;
+  padding: 12px 20px; background: var(--bg-secondary);
+  gap: 12px; flex-shrink: 0;
+}
+.header h1 { font-size: 20px; font-weight: 700; flex: 1; color: var(--accent-primary); }
+.header-meta { font-size: 14px; color: var(--accent-secondary); font-weight: 600; }
+.back-btn {
+  background: transparent; color: var(--text-primary);
+  font-size: 22px; padding: 8px 12px;
+  border-radius: var(--radius-sm); border: 2px solid transparent;
+}
 
 /* Content */
-.content-area{flex:1;padding:8px 0;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.content {
+  flex: 1; padding: 12px 20px;
+  overflow-y: auto; display: flex;
+  flex-direction: column; gap: 8px;
+}
 
-/* Card grid */
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1}
-.card{border-radius:12px;padding:16px 12px;text-align:center;display:flex;flex-direction:column;
-align-items:center;justify-content:center}
-.card-icon{font-size:28px;margin-bottom:6px}
-.card-label{font-size:15px;font-weight:700;color:var(--text)}
-.card-est{font-size:14px;color:var(--text3);margin-top:4px}
-.card-bw{background:var(--bg2);border-color:var(--border)}
-.card-c41{background:linear-gradient(135deg,#5a2020,#2a3a5a);border-color:#ff8a65}
-.card-print{background:#1a2a1a;border-color:#4caf50}
-.card-push{background:#2a1a3a;border-color:#9c27b0}
-.card-timer{background:#1a2a3a;border-color:#1976d2}
-.card-badges{background:#3a3010;border-color:#f9a825}
+/* Focus States */
+.focusable {
+  transition: all 0.15s ease;
+  border: 2px solid transparent;
+  cursor: pointer; min-height: 44px;
+}
+.focusable:focus {
+  outline: none;
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 20px var(--focus-glow);
+}
+.focusable:active { transform: scale(0.96); }
 
-/* Setup pickers */
-.pick-row{display:flex;align-items:center;margin-bottom:8px;background:var(--bg2);border-radius:8px;min-height:88px}
-.pick-label{font-size:15px;color:var(--text3);padding:0 12px;min-width:60px;font-weight:600}
-.pick-prev,.pick-next{padding:8px 16px;font-size:24px;color:var(--amber);background:transparent;border:none;min-width:48px;min-height:88px}
-.pick-val{flex:1;text-align:center;font-size:16px;color:var(--amber);font-weight:700}
-.form-label{font-size:15px;color:var(--text3);margin-bottom:4px;font-weight:600}
-.lcd{margin:8px 0;padding:16px;border:2px solid var(--amber);border-radius:12px;text-align:center;
-background:var(--bg2);box-shadow:0 0 20px rgba(255,140,0,0.15)}
-.lcd-time{font-size:28px;font-weight:800;color:var(--amber);letter-spacing:4px;
-text-shadow:0 0 15px rgba(255,140,0,0.4)}
+/* Nav Bar */
+.nav-bar {
+  display: flex; gap: 8px;
+  padding: 12px 20px; background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+.nav-item {
+  flex: 1; padding: 16px; background: var(--bg-tertiary);
+  border-radius: var(--radius-md); color: var(--text-primary);
+  font-size: 16px; font-weight: 600; text-align: center;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-item:focus { background: var(--bg-card); }
+.nav-item.primary { background: var(--accent-primary); color: var(--bg-primary); }
+.nav-item.primary:focus { background: #ffaa33; }
+.nav-item.danger { background: var(--danger); color: white; }
+
+/* Card Grid */
+.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card {
+  background: var(--bg-card); border-radius: var(--radius-md);
+  padding: 16px 12px; text-align: center;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.card:focus { border-color: var(--focus-ring); box-shadow: 0 0 20px var(--focus-glow); }
+.card-icon { font-size: 28px; margin-bottom: 6px; }
+.card-title { font-size: 15px; font-weight: 700; }
+.card-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.card-c41 { background: linear-gradient(135deg, #3a1520, #1a2a4a); }
+.card-print { background: #1a2a1a; }
+.card-push { background: #2a1a3a; }
+.card-timer { background: #1a2a3a; }
+.card-badges { background: #3a3010; }
+
+/* Picker Rows */
+.picker-row {
+  display: flex; align-items: center;
+  background: var(--bg-secondary); border-radius: var(--radius-sm);
+  min-height: 52px; margin-bottom: 6px;
+}
+.picker-label {
+  font-size: 12px; color: var(--text-secondary);
+  padding: 0 12px; min-width: 55px; font-weight: 700;
+}
+.picker-btn {
+  padding: 8px 14px; font-size: 18px;
+  color: var(--accent-primary); background: transparent;
+  border: none; min-width: 44px; min-height: 44px;
+}
+.picker-value {
+  flex: 1; text-align: center; font-size: 15px;
+  color: var(--accent-primary); font-weight: 700;
+}
+
+/* LCD Display */
+.lcd-display {
+  margin: 8px 0; padding: 16px;
+  border: 2px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  text-align: center; background: var(--bg-secondary);
+}
+.lcd-time {
+  font-size: 32px; font-weight: 800;
+  color: var(--accent-primary); letter-spacing: 4px;
+}
 
 /* Timer */
-.t-step{font-size:16px;font-weight:700;text-align:center;color:var(--amber);margin:8px 0}
-.t-hearts{display:flex;justify-content:center;gap:6px;margin:4px 0}
-.t-heart{font-size:16px;opacity:.2}.t-heart.filled{opacity:1;color:var(--red)}.t-heart.active-heart{opacity:.7;color:var(--amber)}
-.t-big{font-size:48px;font-weight:800;text-align:center;color:var(--amber);margin:4px 0;font-variant-numeric:tabular-nums;
-text-shadow:0 0 20px rgba(255,140,0,0.3)}
-.t-line{position:relative;padding:12px 0 24px}
-.t-wire{height:2px;background:var(--border);position:absolute;top:16px;left:12px;right:12px}
-.t-items{display:flex;justify-content:space-around;position:relative}
-.t-item{display:flex;flex-direction:column;align-items:center}
-.t-clip{width:6px;height:10px;background:var(--border);margin-bottom:1px;border-radius:1px 1px 0 0}
-.t-photo{width:36px;height:42px;border:2px solid #333;background:var(--bg2)}
-.t-item.done .t-photo{border-color:var(--amber);background:linear-gradient(145deg,#3a2a10,#2a1a05);
-box-shadow:0 0 8px rgba(255,140,0,0.3)}
-.t-item.active .t-photo{border-color:var(--gold);background:linear-gradient(145deg,#4a3010,#3a2208);
-box-shadow:0 0 12px rgba(255,200,0,0.4);transform:scale(1.1)}
-.t-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;opacity:.4}
-.t-item.done .t-icon,.t-item.active .t-icon{opacity:1}
-.t-lbl{font-size:14px;color:var(--text3);margin-top:3px}
-.t-item.done .t-lbl{color:var(--amber)}.t-item.active .t-lbl{color:var(--gold);text-shadow:0 0 6px rgba(255,200,0,0.5)}
-.t-bar{height:8px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin:6px 0;overflow:hidden}
-.t-bar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));border-radius:4px}
-.t-next{text-align:center;font-size:14px;color:var(--text3);margin:4px 0}
-.t-next strong{color:var(--amber)}
-.t-tip{text-align:center;font-size:15px;color:var(--text3);font-style:italic;margin:2px 0}
-.agit{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--bg2);margin:0 auto 4px;opacity:.3}
-.agit.active{background:var(--amber);border-color:var(--amber);opacity:1}
+.timer-content { align-items: center; }
+.timer-display {
+  font-size: 56px; font-weight: 800;
+  color: var(--accent-primary); text-align: center;
+  font-variant-numeric: tabular-nums; margin: 4px 0;
+}
+.timer-next { font-size: 14px; color: var(--text-secondary); text-align: center; margin: 4px 0; }
+.timer-tip { font-size: 13px; color: var(--text-muted); text-align: center; font-style: italic; }
+.agitate-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--bg-tertiary); background: var(--bg-secondary);
+  margin: 0 auto 4px; opacity: 0.3;
+}
+.agitate-dot.active { background: var(--accent-primary); border-color: var(--accent-primary); opacity: 1; }
 
-/* Ref cards */
-.ref-card{background:var(--bg2);border:2px solid var(--border);border-left:3px solid var(--amber);border-radius:8px;padding:10px 12px;margin-bottom:6px}
-.ref-card h3{font-size:14px;font-weight:700;color:var(--amber);margin-bottom:4px}
-.ref-card p{font-size:15px;color:var(--text3);line-height:1.6}
+/* Clothesline */
+.clothesline { position: relative; padding: 10px 0 22px; width: 100%; }
+.clothesline-wire {
+  height: 2px; background: var(--bg-tertiary);
+  position: absolute; top: 14px; left: 20px; right: 20px;
+}
+.clothesline-items { display: flex; justify-content: space-around; position: relative; }
+.cl-item { display: flex; flex-direction: column; align-items: center; }
+.cl-clip { width: 5px; height: 8px; background: var(--bg-tertiary); margin-bottom: 1px; border-radius: 1px 1px 0 0; }
+.cl-photo {
+  width: 32px; height: 38px; border: 2px solid #333;
+  background: var(--bg-secondary); position: relative;
+}
+.cl-item.done .cl-photo { border-color: var(--accent-primary); background: #2a1a05; }
+.cl-item.active .cl-photo { border-color: var(--accent-secondary); background: #3a2208; transform: scale(1.1); }
+.cl-icon {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); font-size: 12px; opacity: 0.4;
+}
+.cl-item.done .cl-icon, .cl-item.active .cl-icon { opacity: 1; }
+.cl-label { font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+.cl-item.done .cl-label { color: var(--accent-primary); }
+.cl-item.active .cl-label { color: var(--accent-secondary); }
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%; height: 6px;
+  background: var(--bg-tertiary); border-radius: 3px;
+  overflow: hidden; margin: 6px 0;
+}
+.progress-fill {
+  height: 100%; background: var(--accent-primary);
+  border-radius: 3px; transition: width 0.3s ease;
+}
 
 /* Badges */
-.b-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
-.b-card{background:var(--bg2);border:2px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center}
-.b-card.unlocked{border-color:var(--amber);box-shadow:0 0 8px rgba(255,140,0,0.3)}
-.b-card.locked{opacity:.3}
-.b-card-icon{font-size:20px;display:block;margin-bottom:2px}
-.b-card-name{font-size:14px;font-weight:700;color:var(--amber);display:block}
-.b-card-count{font-size:14px;color:var(--text3);display:block;margin-top:2px}
-.b-card-bar{height:3px;background:var(--border);border-radius:2px;margin-top:3px;overflow:hidden}
-.b-card-fill{height:100%;background:var(--amber);border-radius:2px}
-.sec-title{font-size:14px;font-weight:700;color:var(--amber);margin:8px 0 4px}
+.badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+.badge-card {
+  background: var(--bg-secondary); border: 2px solid var(--bg-tertiary);
+  border-radius: var(--radius-sm); padding: 8px 4px; text-align: center;
+}
+.badge-card.unlocked { border-color: var(--accent-primary); }
+.badge-card.locked { opacity: 0.3; }
+.badge-icon { font-size: 20px; display: block; margin-bottom: 2px; }
+.badge-name { font-size: 10px; font-weight: 700; color: var(--accent-primary); }
+.badge-count { font-size: 9px; color: var(--text-muted); margin-top: 2px; }
+.badge-bar { height: 3px; background: var(--bg-tertiary); border-radius: 2px; margin-top: 3px; overflow: hidden; }
+.badge-fill { height: 100%; background: var(--accent-primary); border-radius: 2px; }
+.section-title { font-size: 14px; font-weight: 700; color: var(--accent-primary); margin: 8px 0 4px; }
+
+/* Reference Cards */
+.ref-card {
+  background: var(--bg-secondary); border: 2px solid var(--bg-tertiary);
+  border-left: 3px solid var(--accent-primary);
+  border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px;
+}
+.ref-title { font-size: 14px; font-weight: 700; color: var(--accent-primary); margin-bottom: 4px; }
+.ref-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
 /* Log */
-.log-entry{background:var(--bg2);border:2px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px}
-.log-date{font-size:15px;color:var(--amber)}.log-mode{font-size:14px;font-weight:600;color:var(--text);display:block;margin-top:2px}
-.log-detail{font-size:15px;color:var(--text3);margin-top:2px}
+.log-entry {
+  background: var(--bg-secondary); border: 2px solid var(--bg-tertiary);
+  border-radius: var(--radius-sm); padding: 10px; margin-bottom: 6px;
+}
+.log-date { font-size: 12px; color: var(--accent-primary); }
+.log-mode { font-size: 14px; font-weight: 600; display: block; margin-top: 2px; }
+.log-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
-/* Modal */
-.overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(28,30,33,.92);
-display:flex;align-items:center;justify-content:center;z-index:50}
-.overlay.hidden{display:none}
-.overlay-content{display:flex;flex-direction:column;align-items:center;gap:12px;padding:32px;
-background:var(--bg2);border:2px solid var(--amber);border-radius:16px;max-width:400px;width:90%}
-.overlay-content p{font-size:18px;font-weight:600;color:var(--amber);text-align:center}
-.overlay-xp{font-size:28px;font-weight:800;color:var(--gold);display:none}
-.overlay-xp.vis{display:block}
-.overlay-btn{width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:600;text-align:center}
+/* Overlay */
+.overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(10, 10, 15, 0.92);
+  display: flex; align-items: center; justify-content: center; z-index: 50;
+}
+.overlay.hidden { display: none; }
+.overlay-content {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 32px; background: var(--bg-secondary);
+  border: 2px solid var(--accent-primary); border-radius: var(--radius-lg);
+  max-width: 400px; width: 90%;
+}
+.overlay-btn { width: 100%; }
+.confirm-xp {
+  font-size: 28px; font-weight: 800; color: var(--accent-secondary);
+  display: none;
+}
+.confirm-xp.visible { display: block; }
+.confirm-msg { font-size: 18px; font-weight: 600; color: var(--accent-primary); text-align: center; }
 
-/* Stepper */
-.stepper-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.step-btn{width:88px;height:88px;background:var(--bg2);border-radius:12px;font-size:24px;color:var(--amber);
-display:flex;align-items:center;justify-content:center}
-.step-val{flex:1;text-align:center;font-size:22px;font-weight:700;color:var(--gold)}
+/* Empty State */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 60px 40px; text-align: center;
+  color: var(--text-secondary); font-size: 16px;
+}
 
-/* Toggle */
-.toggle-row{display:flex;border:2px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
-.toggle-row button{flex:1;padding:14px;font-size:14px;color:var(--text3);background:var(--bg2);min-height:48px}
-.toggle-row button.active{background:var(--amber);color:var(--bg)}
+/* Transfer Alert */
+.transfer-alert {
+  position: fixed; inset: 0; border: 4px solid var(--accent-primary);
+  pointer-events: none; opacity: 0; z-index: 100;
+}
+.transfer-alert.active { opacity: 1; }
 
-/* Transfer alert */
-.transfer-alert{position:fixed;inset:0;border:4px solid var(--amber);pointer-events:none;opacity:0;z-index:100}
-.transfer-alert.active{opacity:1}
-
-.hidden{display:none!important}
-</style>
-</head>
+/* Utility */
+.hidden { display: none !important; }
+</style></head>
 <body>
-<div id="app">
-<div class="transfer-alert" id="transferAlert"></div>
+  <div id="app">
 
-<!-- CONFIRM OVERLAY -->
-<div id="confirmModal" class="overlay hidden">
-<div class="overlay-content">
-<div class="overlay-xp" id="confirmXp"></div>
-<p id="confirmMsg"></p>
-<button class="nav-item focusable primary overlay-btn" data-action="confirm-yes">YES</button>
-<button class="nav-item focusable overlay-btn" data-action="confirm-no">CANCEL</button>
-</div></div>
+    <!-- HOME -->
+    <div id="home" class="screen">
+      <header class="header">
+        <h1>Darkroom Buddy</h1>
+        <span class="header-meta" id="xpDisplay">0 XP</span>
+      </header>
+      <div class="content">
+        <div class="data-grid">
+          <button class="card focusable" tabindex="0" data-action="setup-bw">
+            <div class="card-icon">&#128247;</div>
+            <div class="card-title">B&W Film</div>
+            <div class="card-subtitle">~27min</div>
+          </button>
+          <button class="card focusable card-c41" tabindex="0" data-action="setup-c41">
+            <div class="card-icon">&#127752;</div>
+            <div class="card-title">C-41 Color</div>
+            <div class="card-subtitle">~18min</div>
+          </button>
+          <button class="card focusable card-print" tabindex="0" data-action="setup-print">
+            <div class="card-icon">&#128444;</div>
+            <div class="card-title">Print</div>
+            <div class="card-subtitle">~4min</div>
+          </button>
+          <button class="card focusable card-push" tabindex="0" data-action="setup-push">
+            <div class="card-icon">&#11014;</div>
+            <div class="card-title">Push/Pull</div>
+            <div class="card-subtitle">~30min</div>
+          </button>
+          <button class="card focusable card-timer" tabindex="0" data-action="go-free">
+            <div class="card-icon">&#9203;</div>
+            <div class="card-title">Timer</div>
+            <div class="card-subtitle">custom</div>
+          </button>
+          <button class="card focusable card-badges" tabindex="0" data-action="go-badges">
+            <div class="card-icon">&#127942;</div>
+            <div class="card-title">Badges</div>
+            <div class="card-subtitle">&nbsp;</div>
+          </button>
+        </div>
+      </div>
+      <nav class="nav-bar">
+        <button class="nav-item focusable" data-action="go-ref">Reference</button>
+        <button class="nav-item focusable" data-action="go-log">Log</button>
+      </nav>
+    </div>
 
-<!-- HOME -->
-<div id="home" class="screen">
-<header class="header"><h1>Darkroom Buddy</h1><span class="header-meta" id="xpDisplay">0 XP</span></header>
-<div class="content-area">
-<div class="card-grid">
-<button class="card card-bw focusable" data-action="setup-bw"><span class="content"><span class="card-icon">📷</span><span class="card-label">B&W Film</span><span class="card-est">~27min</span></span></button>
-<button class="card card-c41 focusable" data-action="setup-c41"><span class="content"><span class="card-icon">🌈</span><span class="card-label">C-41 Color</span><span class="card-est">~18min</span></span></button>
-<button class="card card-print focusable" data-action="setup-print"><span class="content"><span class="card-icon">🖼</span><span class="card-label">Print</span><span class="card-est">~4min</span></span></button>
-<button class="card card-push focusable" data-action="setup-push"><span class="content"><span class="card-icon">⬆</span><span class="card-label">Push/Pull</span><span class="card-est">~30min</span></span></button>
-<button class="card card-timer focusable" data-action="free-timer"><span class="content"><span class="card-icon">⏳</span><span class="card-label">Timer</span><span class="card-est">custom</span></span></button>
-<button class="card card-badges focusable" data-action="show-badges"><span class="content"><span class="card-icon">🏆</span><span class="card-label">Badges</span></span></button>
-</div>
-</div>
-<nav class="nav-bar">
-<button class="nav-item focusable" data-action="show-ref">Reference</button>
-<button class="nav-item focusable" data-action="show-log">Log</button>
-</nav>
-</div>
+    <!-- SETUP -->
+    <div id="setup" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1 id="setupTitle">B&W Setup</h1>
+      </header>
+      <div class="content">
+        <div class="picker-row">
+          <span class="picker-label">FILM</span>
+          <button class="focusable picker-btn" data-action="film-prev">&#9664;</button>
+          <span class="picker-value" id="filmVal">Tri-X 400</span>
+          <button class="focusable picker-btn" data-action="film-next">&#9654;</button>
+        </div>
+        <div class="picker-row">
+          <span class="picker-label">DEV</span>
+          <button class="focusable picker-btn" data-action="dev-prev">&#9664;</button>
+          <span class="picker-value" id="devVal">D-76 Stock</span>
+          <button class="focusable picker-btn" data-action="dev-next">&#9654;</button>
+        </div>
+        <div class="picker-row" id="dilRow">
+          <span class="picker-label">DIL</span>
+          <button class="focusable picker-btn" data-action="dil-prev">&#9664;</button>
+          <span class="picker-value" id="dilVal">Stock</span>
+          <button class="focusable picker-btn" data-action="dil-next">&#9654;</button>
+        </div>
+        <div class="picker-row">
+          <span class="picker-label">TEMP</span>
+          <button class="focusable picker-btn" data-action="temp-down">&#9664;</button>
+          <span class="picker-value" id="tempVal">68&#176;F</span>
+          <button class="focusable picker-btn" data-action="temp-up">&#9654;</button>
+        </div>
+        <div class="picker-row" id="pushRow">
+          <span class="picker-label">PUSH</span>
+          <button class="focusable picker-btn" data-action="push-down">&#9664;</button>
+          <span class="picker-value" id="pushVal">0</span>
+          <button class="focusable picker-btn" data-action="push-up">&#9654;</button>
+        </div>
+        <div class="lcd-display">
+          <div class="lcd-time" id="calcTime">--:--</div>
+        </div>
+      </div>
+      <nav class="nav-bar">
+        <button class="nav-item focusable primary" data-action="start-process">Start</button>
+      </nav>
+    </div>
 
-<!-- SETUP -->
-<div id="setup" class="screen hidden">
-<header class="header"><button class="back-btn focusable" data-action="back">&#8592;</button><h1 id="setupTitle">B&W Setup</h1></header>
-<div class="content-area">
-<div class="pick-row" id="filmRow"><span class="pick-label">FILM</span><button class="focusable pick-prev" data-action="pick-film-prev" style="min-height:44px">◄</button><span class="pick-val" id="filmVal">—</span><button class="focusable pick-next" data-action="pick-film-next" style="min-height:44px">►</button></div>
-<div class="pick-row" id="devRow"><span class="pick-label">DEV</span><button class="focusable pick-prev" data-action="pick-dev-prev" style="min-height:44px">◄</button><span class="pick-val" id="devVal">—</span><button class="focusable pick-next" data-action="pick-dev-next" style="min-height:44px">►</button></div>
-<div class="pick-row" id="dilRow"><span class="pick-label">DIL</span><button class="focusable pick-prev" data-action="pick-dil-prev" style="min-height:44px">◄</button><span class="pick-val" id="dilVal">—</span><button class="focusable pick-next" data-action="pick-dil-next" style="min-height:44px">►</button></div>
-<div class="pick-row"><span class="pick-label">TEMP</span><button class="focusable pick-prev" data-action="temp-down" style="min-height:44px">◄</button><span class="pick-val" id="tempVal">68°F</span><button class="focusable pick-next" data-action="temp-up" style="min-height:44px">►</button></div>
-<div class="pick-row" id="pushRow"><span class="pick-label">PUSH</span><button class="focusable pick-prev" data-action="push-down" style="min-height:44px">◄</button><span class="pick-val" id="pushVal">0</span><button class="focusable pick-next" data-action="push-up" style="min-height:44px">►</button></div>
-<div class="lcd"><div class="lcd-time" id="calcTime">--:--</div></div>
-</div>
-<nav class="nav-bar"><button class="nav-item focusable primary" data-action="start-process">START</button></nav>
-</div>
+    <!-- PRINT SETUP -->
+    <div id="print-setup" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>Print Setup</h1>
+      </header>
+      <div class="content">
+        <div class="picker-row">
+          <span class="picker-label">MODE</span>
+          <button class="focusable picker-btn" data-action="mode-prev">&#9664;</button>
+          <span class="picker-value" id="modeVal">Test Strip</span>
+          <button class="focusable picker-btn" data-action="mode-next">&#9654;</button>
+        </div>
+        <div id="testOpts">
+          <div class="picker-row">
+            <span class="picker-label">BASE</span>
+            <button class="focusable picker-btn" data-action="base-down">&#9664;</button>
+            <span class="picker-value" id="baseVal">5s</span>
+            <button class="focusable picker-btn" data-action="base-up">&#9654;</button>
+          </div>
+          <div class="picker-row">
+            <span class="picker-label">STRIPS</span>
+            <button class="focusable picker-btn" data-action="strips-down">&#9664;</button>
+            <span class="picker-value" id="stripsVal">5</span>
+            <button class="focusable picker-btn" data-action="strips-up">&#9654;</button>
+          </div>
+        </div>
+        <div id="finalOpts" class="hidden">
+          <div class="picker-row">
+            <span class="picker-label">EXP</span>
+            <button class="focusable picker-btn" data-action="exp-down">&#9664;</button>
+            <span class="picker-value" id="expVal">12s</span>
+            <button class="focusable picker-btn" data-action="exp-up">&#9654;</button>
+          </div>
+        </div>
+      </div>
+      <nav class="nav-bar">
+        <button class="nav-item focusable primary" data-action="start-print">Start</button>
+      </nav>
+    </div>
 
-<!-- PRINT SETUP -->
-<div id="printSetup" class="screen hidden">
-<header class="header"><button class="back-btn focusable" data-action="back">&#8592;</button><h1>Print Setup</h1></header>
-<div class="content-area">
-<div class="toggle-row"><button class="active focusable" id="btnTS" data-action="mode-test" style="min-height:44px">Test Strip</button><button class="focusable" id="btnFE" data-action="mode-final" style="min-height:44px">Final</button></div>
-<div id="testOpts"><div class="pick-row"><span class="pick-label">BASE</span><button class="focusable pick-prev" data-action="base-down" style="min-height:44px">◄</button><span class="pick-val" id="baseVal">5s</span><button class="focusable pick-next" data-action="base-up" style="min-height:44px">►</button></div>
-<div class="pick-row"><span class="pick-label">STRIPS</span><button class="focusable pick-prev" data-action="strips-down" style="min-height:44px">◄</button><span class="pick-val" id="stripsVal">5</span><button class="focusable pick-next" data-action="strips-up" style="min-height:44px">►</button></div></div>
-<div id="finalOpts" class="hidden"><div class="pick-row"><span class="pick-label">EXP</span><button class="focusable pick-prev" data-action="exp-down" style="min-height:44px">◄</button><span class="pick-val" id="expVal">12s</span><button class="focusable pick-next" data-action="exp-up" style="min-height:44px">►</button></div></div>
-</div>
-<nav class="nav-bar"><button class="nav-item focusable primary" data-action="start-print">START</button></nav>
-</div>
+    <!-- FREE TIMER SETUP -->
+    <div id="free-setup" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>Free Timer</h1>
+      </header>
+      <div class="content">
+        <div class="picker-row">
+          <span class="picker-label">MIN</span>
+          <button class="focusable picker-btn" data-action="min-down">&#9664;</button>
+          <span class="picker-value" id="minVal">5</span>
+          <button class="focusable picker-btn" data-action="min-up">&#9654;</button>
+        </div>
+        <div class="picker-row">
+          <span class="picker-label">SEC</span>
+          <button class="focusable picker-btn" data-action="sec-down">&#9664;</button>
+          <span class="picker-value" id="secVal">0</span>
+          <button class="focusable picker-btn" data-action="sec-up">&#9654;</button>
+        </div>
+      </div>
+      <nav class="nav-bar">
+        <button class="nav-item focusable primary" data-action="start-free">Start</button>
+      </nav>
+    </div>
 
-<!-- FREE TIMER -->
-<div id="freeSetup" class="screen hidden">
-<header class="header"><button class="back-btn focusable" data-action="back">&#8592;</button><h1>Free Timer</h1></header>
-<div class="content-area">
-<div class="pick-row"><span class="pick-label">MIN</span><button class="focusable pick-prev" data-action="min-down" style="min-height:44px">◄</button><span class="pick-val" id="minVal">5</span><button class="focusable pick-next" data-action="min-up" style="min-height:44px">►</button></div>
-<div class="pick-row"><span class="pick-label">SEC</span><button class="focusable pick-prev" data-action="sec-down" style="min-height:44px">◄</button><span class="pick-val" id="secVal">0</span><button class="focusable pick-next" data-action="sec-up" style="min-height:44px">►</button></div>
-</div>
-<nav class="nav-bar"><button class="nav-item focusable primary" data-action="start-free">START</button></nav>
-</div>
+    <!-- TIMER -->
+    <div id="timer" class="screen hidden">
+      <header class="header">
+        <h1 id="timerStepName">Developer</h1>
+        <span class="header-meta" id="timerHearts"></span>
+      </header>
+      <div class="content timer-content">
+        <div class="agitate-dot" id="agitateInd"></div>
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <div class="clothesline">
+          <div class="clothesline-wire"></div>
+          <div class="clothesline-items" id="clothesline"></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="timerFill" style="width:0%"></div></div>
+        <div class="timer-next" id="timerNext"></div>
+        <div class="timer-tip" id="timerTip"></div>
+      </div>
+      <nav class="nav-bar">
+        <button class="nav-item focusable primary" id="btnPause" data-action="pause">Pause</button>
+        <button class="nav-item focusable danger" data-action="skip">Skip</button>
+        <button class="nav-item focusable" data-action="exit-timer">Exit</button>
+      </nav>
+    </div>
 
-<!-- TIMER -->
-<div id="timer" class="screen hidden">
-<div class="t-step" id="timerStepName">Developer</div>
-<div class="t-hearts" id="heartsRow"></div>
-<div class="agit" id="agitateInd"></div>
-<div class="t-big" id="timerDisplay">00:00</div>
-<div class="t-line"><div class="t-wire"></div><div class="t-items" id="clothesline"></div></div>
-<div class="t-bar"><div class="t-bar-fill" id="timerFill" style="width:0%"></div></div>
-<div class="t-next" id="timerNext"></div>
-<div class="t-tip" id="timerTip"></div>
-<nav class="nav-bar">
-<button class="nav-item focusable primary" id="btnPause" data-action="pause">Pause</button>
-<button class="nav-item focusable danger" data-action="skip">Skip</button>
-<button class="nav-item focusable" data-action="exit-timer">Exit</button>
-</nav>
-</div>
+    <!-- BADGES -->
+    <div id="badges" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>Badges</h1>
+        <span class="header-meta" id="badgeLvl">Novice</span>
+      </header>
+      <div class="content">
+        <div class="section-title">Film</div>
+        <div class="badge-grid" id="filmBadges"></div>
+        <div class="section-title">Print</div>
+        <div class="badge-grid" id="printBadges"></div>
+        <div class="section-title">Mastery</div>
+        <div class="badge-grid" id="masteryBadges"></div>
+      </div>
+    </div>
 
-<!-- BADGES -->
-<div id="badges" class="screen hidden">
-<header class="header"><button class="back-btn focusable" data-action="back">&#8592;</button><h1>Badges</h1><span class="header-meta" id="badgeLvl">Novice</span></header>
-<div class="content-area" style="overflow-y:auto">
-<div class="sec-title">Film</div><div class="b-grid" id="filmBadges"></div>
-<div class="sec-title">Print</div><div class="b-grid" id="printBadges"></div>
-<div class="sec-title">Mastery</div><div class="b-grid" id="masteryBadges"></div>
-</div>
-</div>
+    <!-- REFERENCE -->
+    <div id="ref" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>Reference</h1>
+      </header>
+      <div class="content">
+        <div class="ref-card"><div class="ref-title">Developer &#129514;</div><div class="ref-desc">Converts silver halide to metallic silver. Time and temp critical.</div></div>
+        <div class="ref-card"><div class="ref-title">Stop Bath &#128721;</div><div class="ref-desc">Halts development. 30 sec gentle agitation.</div></div>
+        <div class="ref-card"><div class="ref-title">Fixer &#128295;</div><div class="ref-desc">Removes unexposed silver. ~5 min. Under-fix = purple.</div></div>
+        <div class="ref-card"><div class="ref-title">Hypo Clear &#128167;</div><div class="ref-desc">Cuts wash from 30 to 5-10 min.</div></div>
+        <div class="ref-card"><div class="ref-title">Photo-Flo &#129531;</div><div class="ref-desc">Prevents water spots. Do NOT agitate.</div></div>
+        <div class="ref-card"><div class="ref-title">Temperature &#127777;</div><div class="ref-desc">68&#176;F/20&#176;C standard. +1&#176;F = -10% time.</div></div>
+        <div class="ref-card"><div class="ref-title">Agitation &#128260;</div><div class="ref-desc">Inversion 4x/5s every 30-60s.</div></div>
+        <div class="ref-card"><div class="ref-title">Push/Pull &#11014;</div><div class="ref-desc">Push +1=+30%. Pull -1=-20%.</div></div>
+      </div>
+    </div>
 
-<!-- REFERENCE -->
-<div id="ref" class="screen hidden">
-<header class="header"><button class="back-btn focusable" data-action="back">&#8592;</button><h1>Reference</h1></header>
-<div class="content-area" style="overflow-y:auto">
-<div class="ref-card"><h3>Developer 🧪</h3><p>Converts silver halide to metallic silver. Time & temp critical.</p></div>
-<div class="ref-card"><h3>Stop Bath 🛑</h3><p>Halts development. 30 sec gentle agitation.</p></div>
-<div class="ref-card"><h3>Fixer 🔧</h3><p>Removes unexposed silver. ~5 min. Under-fix = purple.</p></div>
-<div class="ref-card"><h3>Hypo Clear 💧</h3><p>Cuts wash from 30 to 5-10 min.</p></div>
-<div class="ref-card"><h3>Photo-Flo 🫧</h3><p>Prevents water spots. Do NOT agitate.</p></div>
-<div class="ref-card"><h3>Temperature 🌡</h3><p>68°F/20°C standard. +1°F = -10% time.</p></div>
-<div class="ref-card"><h3>Agitation 🔄</h3><p>Inversion 4x/5s every 30-60s.</p></div>
-<div class="ref-card"><h3>Push/Pull ⬆</h3><p>Push +1=+30%. Pull -1=-20%.</p></div>
-</div>
-</div>
+    <!-- LOG -->
+    <div id="log" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>Log</h1>
+      </header>
+      <div class="content" id="logEntries">
+        <div class="empty-state">No sessions yet. Complete a process to earn XP!</div>
+      </div>
+    </div>
 
-<!-- LOG -->
-<div id="log" class="screen hidden">
-<header class="header"><button class="back-btn focusable" data-action="back">&#8592;</button><h1>Log</h1></header>
-<div class="content-area" style="overflow-y:auto" id="logEntries"><p style="color:var(--text3);font-size:14px;text-align:center;margin:40px 0">No sessions yet.</p></div>
-</div>
-</div>
+    <!-- CONFIRM OVERLAY -->
+    <div id="confirm-overlay" class="overlay hidden">
+      <div class="overlay-content">
+        <div class="confirm-xp" id="confirmXp"></div>
+        <div class="confirm-msg" id="confirmMsg"></div>
+        <button class="nav-item focusable primary overlay-btn" data-action="confirm-yes">Yes</button>
+        <button class="nav-item focusable overlay-btn" data-action="confirm-no">Cancel</button>
+      </div>
+    </div>
 
-<script>
-(function(){'use strict';
-var DEV_CHART={"Tri-X 400":{"D-76 Stock":{t:480},"D-76 1+1":{t:570},"HC-110 Dil B":{t:390},"Rodinal 1+25":{t:660},"Rodinal 1+50":{t:900},"Xtol Stock":{t:420},"Xtol 1+1":{t:510},"ID-11 Stock":{t:480},"ID-11 1+1":{t:570}},"HP5+":{"D-76 Stock":{t:450},"D-76 1+1":{t:540},"HC-110 Dil B":{t:360},"Rodinal 1+25":{t:600},"Rodinal 1+50":{t:840},"Xtol Stock":{t:390},"Xtol 1+1":{t:480},"ID-11 Stock":{t:450},"ID-11 1+1":{t:540}},"T-Max 400":{"D-76 Stock":{t:420},"D-76 1+1":{t:510},"HC-110 Dil B":{t:330},"Rodinal 1+25":{t:660},"Rodinal 1+50":{t:780},"Xtol Stock":{t:390},"Xtol 1+1":{t:480},"ID-11 Stock":{t:420},"ID-11 1+1":{t:510}},"Delta 400":{"D-76 Stock":{t:450},"D-76 1+1":{t:540},"HC-110 Dil B":{t:360},"Rodinal 1+25":{t:660},"Rodinal 1+50":{t:840},"Xtol Stock":{t:420},"Xtol 1+1":{t:510},"ID-11 Stock":{t:450},"ID-11 1+1":{t:540}},"FP4+":{"D-76 Stock":{t:390},"D-76 1+1":{t:480},"HC-110 Dil B":{t:300},"Rodinal 1+25":{t:510},"Rodinal 1+50":{t:720},"Xtol Stock":{t:360},"Xtol 1+1":{t:420},"ID-11 Stock":{t:390},"ID-11 1+1":{t:480}}};
-var FILMS=Object.keys(DEV_CHART),C41F=['Portra 400','Portra 160','Portra 800','Ektar 100','Gold 200','Ultramax 400'];
-var DEVS=["D-76 Stock","D-76 1+1","HC-110 Dil B","Rodinal 1+25","Rodinal 1+50","Xtol Stock","Xtol 1+1","ID-11 Stock","ID-11 1+1"];
-var DILS=['Stock','1+1','1+25','1+50'];
-var ICONS={'Pre-Wash':'💧','Developer':'🧪','Rinse':'🛑','Fixer':'🔧','Wash':'🚿','Photo-Flo':'🫧','Blix':'⚗️','Stabilizer':'✨','Exposure':'💡'};
-var LEVELS=[{n:'Novice',x:0},{n:'Apprentice',x:50},{n:'Darkroom Tech',x:150},{n:'Print Master',x:300},{n:'Zone Guru',x:500}];
-var XPR={bw:25,c41:20,'print-test':15,'print-final':15,push:30,free:5};
-var BADGES=[{id:'r1',cat:'film',icon:'📷',name:'First Roll',need:1,fn:function(s){return s.bw+s.c41+s.push}},{id:'r5',cat:'film',icon:'🎬',name:'Five Rolls',need:5,fn:function(s){return s.bw+s.c41+s.push}},{id:'r10',cat:'film',icon:'📷',name:'Ten Rolls',need:10,fn:function(s){return s.bw+s.c41+s.push}},{id:'p1',cat:'print',icon:'🖨',name:'First Print',need:1,fn:function(s){return s.prints}},{id:'p5',cat:'print',icon:'🔬',name:'Test Pro',need:5,fn:function(s){return s.tests}},{id:'m5',cat:'mastery',icon:'🦉',name:'Night Owl',need:5,fn:function(s){return s.total}},{id:'m25',cat:'mastery',icon:'🔥',name:'Dedicated',need:25,fn:function(s){return s.total}}];
-
-var mode='bw',tV=68,push=0,pM='test',fIdx=0,dIdx=0,dlIdx=0,curF=FILMS,curD=DEVS;
-var sv={base:5,strips:5,exp:12,min:5,sec:0};
-var ts={steps:[],cur:0,rem:0,total:0,elapsed:0,running:false,paused:false,lastAg:0,lastTs:0,xfer:0,info:{}};
-var confirmCb=null;
-var $=function(id){return document.getElementById(id)};
-var fmt=function(s){var m=Math.floor(Math.abs(s)/60),sc=Math.floor(Math.abs(s)%60);return String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0')};
-function sIcon(n){for(var k in ICONS)if(n.indexOf(k)!==-1)return ICONS[k];return'⏱';}
-
-// Screens
-function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.add('hidden')});$(id).classList.remove('hidden');lastEnterTime=Date.now();setTimeout(function(){focusFirst($(id));},50);}
-
-// XP
-function getXP(){return parseInt(localStorage.getItem('db_xp')||'0');}
-function lvlName(){var x=getXP();for(var i=LEVELS.length-1;i>=0;i--)if(x>=LEVELS[i].x)return LEVELS[i].n;return LEVELS[0].n;}
-function updateXP(){$('xpDisplay').textContent=getXP()+' XP';}
-
-// Dev time calc
-function calcTime(){var t=mode==='c41'?210:(DEV_CHART[curF[fIdx]]&&DEV_CHART[curF[fIdx]][curD[dIdx]]?DEV_CHART[curF[fIdx]][curD[dIdx]].t:480);var tf=tV;t*=Math.pow(0.9,tf-68);if(push>0)t*=Math.pow(1.3,push);else if(push<0)t*=Math.pow(0.8,Math.abs(push));return Math.max(60,Math.round(t));}
-function updateCalc(){$('calcTime').textContent=fmt(calcTime());$('calcTime').dataset.seconds=calcTime();}
-
-// Steps
-function bwS(dt){return[{name:'Pre-Wash',time:60,tip:'Fill at dev temp.',ag:0},{name:'Developer',time:dt,tip:'Agitate first 30s.',ag:30},{name:'Rinse',time:30,tip:'3-4 inversions.',ag:0},{name:'Fixer',time:300,tip:'Under-fix = purple.',ag:60},{name:'Wash',time:600,tip:'Running water.',ag:0},{name:'Photo-Flo',time:60,tip:'Do NOT agitate.',ag:0}];}
-function c41S(){return[{name:'Pre-Wash',time:60,tip:'102°F.',ag:0},{name:'Developer',time:210,tip:'102°F ±0.5°F.',ag:30},{name:'Blix',time:390,tip:'Agitate 60s.',ag:60},{name:'Wash',time:180,tip:'95-105°F.',ag:0},{name:'Stabilizer',time:60,tip:'Do not rinse.',ag:0}];}
-function printS(){return[{name:'Developer',time:120,tip:'Rock tray.',ag:0},{name:'Rinse',time:30,tip:'Quick.',ag:0},{name:'Fixer',time:300,tip:'2-5min.',ag:60},{name:'Wash',time:600,tip:'RC 5min.',ag:0}];}
-
-function startTimer(steps,info){var tot=steps.reduce(function(a,s){return a+s.time},0);ts={steps:steps,cur:0,rem:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:info};showScreen('timer');buildHearts();buildCL();ts.lastTs=performance.now();tick();}
-function tick(){if(!ts.running)return;var now=performance.now();if(!ts.paused){var d=(now-ts.lastTs)/1000;ts.rem-=d;ts.elapsed+=d;ts.lastAg+=d;var step=ts.steps[ts.cur];if(step.ag>0&&ts.lastAg>=step.ag){ts.lastAg=0;$('agitateInd').classList.add('active');beepAgitate();setTimeout(function(){$('agitateInd').classList.remove('active')},800);}if(ts.rem<=0){if(ts.cur<ts.steps.length-1){if(ts.xfer===0){ts.xfer=1;ts.rem=3;$('transferAlert').classList.add('active');$('timerStepName').textContent='⚡ TRANSFER';beepTransfer();}else{$('transferAlert').classList.remove('active');ts.xfer=0;ts.cur++;ts.rem=ts.steps[ts.cur].time;ts.lastAg=0;beepTransition();updateHearts();updateCL();}}else{finish();return;}}}ts.lastTs=now;updateTimer();setTimeout(tick,500);}
-function updateTimer(){var s=ts.steps[ts.cur];if(ts.xfer===0)$('timerStepName').textContent=s.name;$('timerDisplay').textContent=fmt(Math.max(0,ts.rem));var te=ts.steps.slice(0,ts.cur).reduce(function(a,s){return a+s.time},0)+(s.time-ts.rem);$('timerFill').style.width=Math.min(100,(te/ts.total)*100)+'%';if(ts.cur<ts.steps.length-1){var ns=ts.steps[ts.cur+1];$('timerNext').innerHTML='Next: <strong>'+ns.name+'</strong> '+fmt(ns.time);}else $('timerNext').innerHTML='<strong>Final step!</strong>';$('timerTip').textContent=s.tip||'';$('agitateInd').style.display=s.ag>0?'block':'none';}
-function buildHearts(){var h=$('heartsRow');h.innerHTML='';ts.steps.forEach(function(){var s=document.createElement('span');s.className='t-heart';s.textContent='❤';h.appendChild(s);});updateHearts();}
-function updateHearts(){$('heartsRow').querySelectorAll('.t-heart').forEach(function(h,i){h.classList.remove('filled','active-heart');if(i<ts.cur)h.classList.add('filled');else if(i===ts.cur)h.classList.add('active-heart');});}
-function buildCL(){var c=$('clothesline');c.innerHTML='';ts.steps.forEach(function(s){var it=document.createElement('div');it.className='t-item';var cl=document.createElement('div');cl.className='t-clip';var ph=document.createElement('div');ph.className='t-photo';var ic=document.createElement('span');ic.className='t-icon';ic.textContent=sIcon(s.name);ph.appendChild(ic);var lb=document.createElement('div');lb.className='t-lbl';lb.textContent=s.name.substring(0,4);it.appendChild(cl);it.appendChild(ph);it.appendChild(lb);c.appendChild(it);});updateCL();}
-function updateCL(){$('clothesline').querySelectorAll('.t-item').forEach(function(p,i){p.classList.remove('done','active');if(i<ts.cur)p.classList.add('done');else if(i===ts.cur)p.classList.add('active');});}
-
-function finish(){ts.running=false;$('transferAlert').classList.remove('active');beepComplete();updateHearts();updateCL();var m=ts.info.mode||'free';var amt=XPR[m]||10;var xp=getXP()+amt;localStorage.setItem('db_xp',String(xp));updateXP();var entry={date:new Date().toISOString(),mode:m,film:ts.info.film||'',dev:ts.info.dev||'',totalElapsed:Math.round(ts.elapsed)};var log=JSON.parse(localStorage.getItem('db_log')||'[]');log.unshift(entry);localStorage.setItem('db_log',JSON.stringify(log));showConfirm('Complete!',function(){showScreen('home');},'+ '+amt+' XP');}
-function showConfirm(msg,cb,xp){$('confirmMsg').textContent=msg;var xEl=$('confirmXp');if(xp){xEl.textContent=xp;xEl.classList.add('vis');}else{xEl.textContent='';xEl.classList.remove('vis');}$('confirmModal').classList.remove('hidden');confirmCb=cb;var btn=$('confirmModal').querySelector('.focusable');if(btn)btn.focus();}
-
-function getStats(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');var s={bw:0,c41:0,push:0,prints:0,tests:0,free:0,total:log.length};log.forEach(function(e){if(e.mode==='bw')s.bw++;else if(e.mode==='c41')s.c41++;else if(e.mode==='push')s.push++;else if(e.mode==='print-final')s.prints++;else if(e.mode==='print-test')s.tests++;else s.free++;});return s;}
-function renderBadges(){var st=getStats();['film','print','mastery'].forEach(function(cat){var c=$(cat==='film'?'filmBadges':cat==='print'?'printBadges':'masteryBadges');c.innerHTML='';BADGES.filter(function(b){return b.cat===cat}).forEach(function(b){var cnt=b.fn(st),u=cnt>=b.need,pct=Math.min(100,(cnt/b.need)*100);c.innerHTML+='<div class="b-card '+(u?'unlocked':'locked')+'"><span class="b-card-icon">'+(u?b.icon:'🔒')+'</span><span class="b-card-name">'+b.name+'</span><div class="b-card-bar"><div class="b-card-fill" style="width:'+pct+'%"></div></div><span class="b-card-count">'+cnt+'/'+b.need+'</span></div>';});});$('badgeLvl').textContent=lvlName();}
-function renderLog(){var log=JSON.parse(localStorage.getItem('db_log')||'[]');var el=$('logEntries');if(!log.length){el.innerHTML='<p style="color:var(--text3);font-size:14px;text-align:center;margin:40px 0">No sessions yet.</p>';return;}el.innerHTML=log.slice(0,6).map(function(e){var d=new Date(e.date);var label=e.mode==='bw'?'B&W':e.mode==='c41'?'C-41':'Other';return'<div class="log-entry"><span class="log-date">'+d.toLocaleDateString()+'</span><span class="log-mode">'+label+(e.film?' — '+e.film:'')+'</span><span class="log-detail">'+fmt(e.totalElapsed)+'</span></div>';}).join('');}
-
-// Analog Camera Audio Engine
-var audioCtx=null;
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();}
-document.addEventListener('touchstart',function(){initAudio();},{once:true});
-document.addEventListener('click',function(){initAudio();},{once:true});
-function noiseBuffer(d){initAudio();var l=audioCtx.sampleRate*d,b=audioCtx.createBuffer(1,l,audioCtx.sampleRate),da=b.getChannelData(0);for(var i=0;i<l;i++)da[i]=Math.random()*2-1;return b;}
-function clickSound(v,f,d,dl){try{initAudio();var t=audioCtx.currentTime+(dl||0);var s=audioCtx.createBufferSource();s.buffer=noiseBuffer(d||.03);var fi=audioCtx.createBiquadFilter();fi.type='bandpass';fi.frequency.value=f||2000;fi.Q.value=8;var g=audioCtx.createGain();g.gain.setValueAtTime(v||.3,t);g.gain.exponentialRampToValueAtTime(.001,t+(d||.03));s.connect(fi);fi.connect(g);g.connect(audioCtx.destination);s.start(t);}catch(e){}}
-function beepNav(){clickSound(.25,3000,.015);}
-function beepSelect(){clickSound(.3,2500,.012);clickSound(.2,1800,.015,.04);}
-function beepAgitate(){for(var i=0;i<4;i++)clickSound(.15,4000+Math.random()*2000,.008,i*.03);}
-function beepTransition(){clickSound(.4,1200,.025);setTimeout(function(){try{initAudio();var t=audioCtx.currentTime;var o=audioCtx.createOscillator();var g=audioCtx.createGain();o.type='triangle';o.frequency.value=800;g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.15);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+.15);}catch(e){}},60);}
-function beepTransfer(){for(var i=0;i<3;i++)clickSound(.35,1500,.02,i*.15);}
-function beepComplete(){try{initAudio();var t=audioCtx.currentTime;var o=audioCtx.createOscillator();var g=audioCtx.createGain();o.type='sine';o.frequency.value=120;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.06,t+.1);g.gain.exponentialRampToValueAtTime(.001,t+.8);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+.8);}catch(e){}setTimeout(function(){clickSound(.35,2000,.02)},300);setTimeout(function(){clickSound(.4,1800,.025)},500);setTimeout(function(){clickSound(.5,1000,.04)},700);}
-
-// Actions
-document.addEventListener('click',function(e){var btn=e.target.closest('[data-action]');if(!btn)return;beepSelect();var a=btn.dataset.action;
-if(a==='setup-bw'){mode='bw';curF=FILMS;curD=DEVS;fIdx=0;dIdx=0;dlIdx=0;push=0;showScreen('setup');$('setupTitle').textContent='B&W Setup';$('dilRow').classList.remove('hidden');$('pushRow').classList.remove('hidden');$('filmVal').textContent=curF[fIdx];$('devVal').textContent=curD[dIdx];$('dilVal').textContent=DILS[dlIdx];$('pushVal').textContent='0';$('tempVal').textContent=tV+'°F';updateCalc();}
-else if(a==='setup-c41'){mode='c41';curF=C41F;curD=['C-41 Kit'];fIdx=0;dIdx=0;push=0;showScreen('setup');$('setupTitle').textContent='C-41 Setup';$('dilRow').classList.add('hidden');$('pushRow').classList.add('hidden');$('filmVal').textContent=curF[fIdx];$('devVal').textContent=curD[dIdx];$('tempVal').textContent=tV+'°F';updateCalc();}
-else if(a==='setup-push'){mode='push';curF=FILMS;curD=DEVS;fIdx=0;dIdx=0;dlIdx=0;push=0;showScreen('setup');$('setupTitle').textContent='Push/Pull';$('dilRow').classList.remove('hidden');$('pushRow').classList.remove('hidden');$('filmVal').textContent=curF[fIdx];$('devVal').textContent=curD[dIdx];$('dilVal').textContent=DILS[dlIdx];$('pushVal').textContent='0';$('tempVal').textContent=tV+'°F';updateCalc();}
-else if(a==='setup-print'){showScreen('printSetup');}
-else if(a==='free-timer'){showScreen('freeSetup');$('minVal').textContent=sv.min;$('secVal').textContent=sv.sec;}
-else if(a==='show-badges'){renderBadges();showScreen('badges');}
-else if(a==='show-ref'){showScreen('ref');}
-else if(a==='show-log'){renderLog();showScreen('log');}
-else if(a==='back'){showScreen('home');}
-else if(a==='pick-film-prev'){fIdx=(fIdx-1+curF.length)%curF.length;$('filmVal').textContent=curF[fIdx];updateCalc();}
-else if(a==='pick-film-next'){fIdx=(fIdx+1)%curF.length;$('filmVal').textContent=curF[fIdx];updateCalc();}
-else if(a==='pick-dev-prev'){dIdx=(dIdx-1+curD.length)%curD.length;$('devVal').textContent=curD[dIdx];updateCalc();}
-else if(a==='pick-dev-next'){dIdx=(dIdx+1)%curD.length;$('devVal').textContent=curD[dIdx];updateCalc();}
-else if(a==='pick-dil-prev'){dlIdx=(dlIdx-1+DILS.length)%DILS.length;$('dilVal').textContent=DILS[dlIdx];}
-else if(a==='pick-dil-next'){dlIdx=(dlIdx+1)%DILS.length;$('dilVal').textContent=DILS[dlIdx];}
-else if(a==='temp-down'){tV--;$('tempVal').textContent=tV+'°F';updateCalc();}
-else if(a==='temp-up'){tV++;$('tempVal').textContent=tV+'°F';updateCalc();}
-else if(a==='push-down'){push=Math.max(-3,push-1);$('pushVal').textContent=(push>0?'+':'')+push;updateCalc();}
-else if(a==='push-up'){push=Math.min(3,push+1);$('pushVal').textContent=(push>0?'+':'')+push;updateCalc();}
-else if(a==='start-process'){startTimer(mode==='c41'?c41S():bwS(calcTime()),{mode:mode,film:curF[fIdx],dev:curD[dIdx]});}
-else if(a==='mode-test'){pM='test';$('btnTS').classList.add('active');$('btnFE').classList.remove('active');$('testOpts').classList.remove('hidden');$('finalOpts').classList.add('hidden');}
-else if(a==='mode-final'){pM='final';$('btnFE').classList.add('active');$('btnTS').classList.remove('active');$('finalOpts').classList.remove('hidden');$('testOpts').classList.add('hidden');}
-else if(a==='base-down'){sv.base=Math.max(1,sv.base-1);$('baseVal').textContent=sv.base+'s';}
-else if(a==='base-up'){sv.base=Math.min(120,sv.base+1);$('baseVal').textContent=sv.base+'s';}
-else if(a==='strips-down'){sv.strips=Math.max(2,sv.strips-1);$('stripsVal').textContent=sv.strips;}
-else if(a==='strips-up'){sv.strips=Math.min(12,sv.strips+1);$('stripsVal').textContent=sv.strips;}
-else if(a==='exp-down'){sv.exp=Math.max(1,sv.exp-1);$('expVal').textContent=sv.exp+'s';}
-else if(a==='exp-up'){sv.exp=Math.min(300,sv.exp+1);$('expVal').textContent=sv.exp+'s';}
-else if(a==='start-print'){var steps;if(pM==='test'){steps=[];for(var i=1;i<=sv.strips;i++)steps.push({name:'Strip '+i,time:sv.base,tip:i<sv.strips?'Cover next':'Last!',ag:0});steps=steps.concat(printS());}else{steps=[{name:'Exposure',time:sv.exp,tip:'Hold still.',ag:0}].concat(printS());}startTimer(steps,{mode:'print-'+pM});}
-else if(a==='min-down'){sv.min=Math.max(0,sv.min-1);$('minVal').textContent=sv.min;}
-else if(a==='min-up'){sv.min=Math.min(60,sv.min+1);$('minVal').textContent=sv.min;}
-else if(a==='sec-down'){sv.sec=Math.max(0,sv.sec-5);$('secVal').textContent=sv.sec;}
-else if(a==='sec-up'){sv.sec=Math.min(55,sv.sec+5);$('secVal').textContent=sv.sec;}
-else if(a==='start-free'){var s=sv.min*60+sv.sec;if(s>0)startTimer([{name:'Free Timer',time:s,tip:'',ag:0}],{mode:'free'});}
-else if(a==='pause'){ts.paused=!ts.paused;$('btnPause').textContent=ts.paused?'Resume':'Pause';if(!ts.paused)ts.lastTs=performance.now();}
-else if(a==='skip'){if(ts.cur>=ts.steps.length-1){finish();}else{ts.elapsed+=ts.rem;ts.xfer=0;$('transferAlert').classList.remove('active');ts.cur++;ts.rem=ts.steps[ts.cur].time;ts.lastAg=0;updateHearts();updateCL();}}
-else if(a==='exit-timer'){ts.running=false;showScreen('home');}
-else if(a==='confirm-yes'){$('confirmModal').classList.add('hidden');if(confirmCb)confirmCb();}
-else if(a==='confirm-no'){$('confirmModal').classList.add('hidden');}
-});
-
-// D-pad focus navigation — matches official template exactly
-function getCurrentScreen(){
-  var overlay=$('confirmModal');
-  if(overlay&&!overlay.classList.contains('hidden'))return overlay;
-  var screens=document.querySelectorAll('.screen');
-  for(var i=0;i<screens.length;i++){if(!screens[i].classList.contains('hidden'))return screens[i];}
-  return document.body;
-}
-
-function moveFocus(direction){
-  var container=getCurrentScreen();
-  var focusables=Array.from(container.querySelectorAll('.focusable:not([disabled])')).filter(function(el){return el.offsetParent!==null;});
-  if(!focusables.length)return;
-  var current=document.activeElement;
-  var idx=focusables.indexOf(current);
-  if(idx===-1){focusables[0].focus();return;}
-  var nextIdx;
-  if(direction==='up'||direction==='left'){nextIdx=idx>0?idx-1:focusables.length-1;}
-  else{nextIdx=idx<focusables.length-1?idx+1:0;}
-  focusables[nextIdx].focus();
-  var scrollParent=focusables[nextIdx].closest('.content-area,.content');
-  if(scrollParent)focusables[nextIdx].scrollIntoView({block:'nearest',behavior:'smooth'});
-}
-
-function focusFirst(container){
-  // Skip back buttons — focus the first real content element
-  var els=container.querySelectorAll('.focusable:not([disabled]):not(.back-btn)');
-  var el=els.length>0?els[0]:container.querySelector('.focusable:not([disabled])');
-  if(el)el.focus();
-}
-
-// Debounce Enter to prevent double-fire on screen transitions
-var lastEnterTime=0;
-var ENTER_DEBOUNCE=400;
-
-// Debug: show what input events the browser actually sends
-var debugEl=document.createElement('div');
-debugEl.style.cssText='position:fixed;bottom:4px;left:4px;color:#FF8C00;font-size:10px;z-index:9999;opacity:0.7;font-family:monospace';
-debugEl.textContent='input: waiting...';
-document.body.appendChild(debugEl);
-function debugInput(msg){debugEl.textContent='input: '+msg;setTimeout(function(){debugEl.textContent='input: waiting...';},2000);}
-
-// Listen for ALL possible input events
-document.addEventListener('keydown',function(e){
-  debugInput('key: '+e.key+' ('+e.keyCode+')');
-  switch(e.key){
-    case 'ArrowUp':case 'ArrowLeft':
-      moveFocus('up');beepNav();e.preventDefault();break;
-    case 'ArrowDown':case 'ArrowRight':
-      moveFocus('down');beepNav();e.preventDefault();break;
-    case 'Enter':case ' ':
-      var now=Date.now();
-      if(now-lastEnterTime<ENTER_DEBOUNCE){e.preventDefault();break;}
-      lastEnterTime=now;
-      if(document.activeElement&&document.activeElement.classList.contains('focusable')){
-        document.activeElement.click();
-      }
-      e.preventDefault();break;
-    case 'Escape':case 'Backspace':
-      showScreen('home');e.preventDefault();break;
-    default:
-      // Catch numeric keycodes that some browsers send instead of named keys
-      if(e.keyCode===38||e.keyCode===37){moveFocus('up');beepNav();e.preventDefault();}
-      else if(e.keyCode===40||e.keyCode===39){moveFocus('down');beepNav();e.preventDefault();}
-      else if(e.keyCode===13||e.keyCode===32){
-        var now2=Date.now();if(now2-lastEnterTime<ENTER_DEBOUNCE)break;lastEnterTime=now2;
-        if(document.activeElement&&document.activeElement.classList.contains('focusable'))document.activeElement.click();
-        e.preventDefault();
-      }
-      break;
-  }
-},true); // Use capture phase to intercept before browser
-
-// Also listen on window in case document doesn't get events
-window.addEventListener('keydown',function(e){
-  debugInput('win-key: '+e.key+' ('+e.keyCode+')');
-},true);
-
-// Log pointer events to debug cursor behavior
-document.addEventListener('pointerdown',function(e){debugInput('ptr: '+Math.round(e.clientX)+','+Math.round(e.clientY));});
-document.addEventListener('mousedown',function(e){debugInput('mouse: '+Math.round(e.clientX)+','+Math.round(e.clientY));});
-
-updateXP();
-setTimeout(function(){focusFirst($('home'));},100);
-})();
-</script>
+  </div>
+  
 </body>
-</html>
+<script>
+(function() {
+  'use strict';
+
+  // ==================== CONFIG ====================
+  var CONFIG = {
+    appName: 'Darkroom Buddy',
+    storageKey: 'darkroom_buddy',
+  };
+
+  // ==================== DEV CHART ====================
+  var DEV_CHART = {
+    'Tri-X 400': {'D-76 Stock':{t:480},'D-76 1+1':{t:570},'HC-110 B':{t:390},'Rod 1+25':{t:660},'Rod 1+50':{t:900},'Xtol Stock':{t:420},'Xtol 1+1':{t:510},'ID-11 Stock':{t:480},'ID-11 1+1':{t:570}},
+    'HP5+': {'D-76 Stock':{t:450},'D-76 1+1':{t:540},'HC-110 B':{t:360},'Rod 1+25':{t:600},'Rod 1+50':{t:840},'Xtol Stock':{t:390},'Xtol 1+1':{t:480},'ID-11 Stock':{t:450},'ID-11 1+1':{t:540}},
+    'T-Max 400': {'D-76 Stock':{t:420},'D-76 1+1':{t:510},'HC-110 B':{t:330},'Rod 1+25':{t:660},'Rod 1+50':{t:780},'Xtol Stock':{t:390},'Xtol 1+1':{t:480},'ID-11 Stock':{t:420},'ID-11 1+1':{t:510}},
+    'Delta 400': {'D-76 Stock':{t:450},'D-76 1+1':{t:540},'HC-110 B':{t:360},'Rod 1+25':{t:660},'Rod 1+50':{t:840},'Xtol Stock':{t:420},'Xtol 1+1':{t:510},'ID-11 Stock':{t:450},'ID-11 1+1':{t:540}},
+    'FP4+': {'D-76 Stock':{t:390},'D-76 1+1':{t:480},'HC-110 B':{t:300},'Rod 1+25':{t:510},'Rod 1+50':{t:720},'Xtol Stock':{t:360},'Xtol 1+1':{t:420},'ID-11 Stock':{t:390},'ID-11 1+1':{t:480}}
+  };
+  var FILMS = Object.keys(DEV_CHART);
+  var C41_FILMS = ['Portra 400','Portra 160','Portra 800','Ektar 100','Gold 200','Ultramax 400'];
+  var DEVS = ['D-76 Stock','D-76 1+1','HC-110 B','Rod 1+25','Rod 1+50','Xtol Stock','Xtol 1+1','ID-11 Stock','ID-11 1+1'];
+  var DILS = ['Stock','1+1','1+25','1+50'];
+  var STEP_ICONS = {'Pre-Wash':'💧','Developer':'🧪','Rinse':'🛑','Fixer':'🔧','Wash':'🚿','Photo-Flo':'🫧','Blix':'⚗️','Stabilizer':'✨','Exposure':'💡'};
+  var LEVELS = [{n:'Novice',x:0},{n:'Apprentice',x:50},{n:'Darkroom Tech',x:150},{n:'Print Master',x:300},{n:'Zone Guru',x:500}];
+  var XP_REWARDS = {bw:25, c41:20, 'print-test':15, 'print-final':15, push:30, free:5};
+  var BADGES = [
+    {id:'r1',cat:'film',icon:'📷',name:'First Roll',need:1,fn:function(s){return s.bw+s.c41+s.push}},
+    {id:'r5',cat:'film',icon:'🎬',name:'Five Rolls',need:5,fn:function(s){return s.bw+s.c41+s.push}},
+    {id:'r10',cat:'film',icon:'📷',name:'Ten Rolls',need:10,fn:function(s){return s.bw+s.c41+s.push}},
+    {id:'p1',cat:'print',icon:'🖨',name:'First Print',need:1,fn:function(s){return s.prints}},
+    {id:'p5',cat:'print',icon:'🔬',name:'Test Pro',need:5,fn:function(s){return s.tests}},
+    {id:'m5',cat:'mastery',icon:'🦉',name:'Night Owl',need:5,fn:function(s){return s.total}},
+    {id:'m25',cat:'mastery',icon:'🔥',name:'Dedicated',need:25,fn:function(s){return s.total}}
+  ];
+
+  // ==================== STATE ====================
+  var state = {
+    currentScreen: 'home',
+    screenHistory: [],
+    data: { mode:'bw', fIdx:0, dIdx:0, dlIdx:0, tV:68, push:0, pM:'test', sv:{base:5,strips:5,exp:12,min:5,sec:0} },
+    curF: FILMS, curD: DEVS,
+    // Timer
+    ts: {steps:[],cur:0,rem:0,total:0,elapsed:0,running:false,paused:false,lastAg:0,lastTs:0,xfer:0,info:{}},
+    confirmCb: null,
+  };
+
+  // ==================== DOM ====================
+  var screens = {};
+  var sdk = null;
+
+  function collectScreens() {
+    document.querySelectorAll('.screen').forEach(function(s) {
+      if (s.id) screens[s.id] = s;
+    });
+  }
+
+  // ==================== NAVIGATION ====================
+  function navigateTo(screenId, options) {
+    options = options || {};
+    var addToHistory = options.addToHistory !== false;
+    if (addToHistory && state.currentScreen) {
+      state.screenHistory.push(state.currentScreen);
+    }
+    Object.values(screens).forEach(function(s) { s.classList.add('hidden'); });
+    if (screens[screenId]) {
+      screens[screenId].classList.remove('hidden');
+      state.currentScreen = screenId;
+      onScreenEnter(screenId);
+      focusFirst(screens[screenId]);
+    }
+  }
+
+  function navigateBack() {
+    if (state.screenHistory.length > 0) {
+      navigateTo(state.screenHistory.pop(), { addToHistory: false });
+    }
+  }
+
+  // ==================== FOCUS MANAGEMENT ====================
+  function focusFirst(container) {
+    var el = container.querySelector('.focusable:not([disabled]):not(.hidden):not(.back-btn)');
+    if (!el) el = container.querySelector('.focusable:not([disabled]):not(.hidden)');
+    if (el) el.focus();
+  }
+
+  function moveFocus(direction) {
+    // Check overlay first
+    var overlay = document.getElementById('confirm-overlay');
+    var container = (overlay && !overlay.classList.contains('hidden')) ? overlay : screens[state.currentScreen];
+    if (!container) return;
+
+    var focusables = Array.from(
+      container.querySelectorAll('.focusable:not([disabled]):not(.hidden)')
+    ).filter(function(el) { return el.offsetParent !== null; });
+    if (focusables.length === 0) return;
+
+    var current = document.activeElement;
+    var idx = focusables.indexOf(current);
+    if (idx === -1) { focusFirst(container); return; }
+
+    var nextIdx;
+    if (direction === 'up' || direction === 'left') {
+      nextIdx = idx > 0 ? idx - 1 : focusables.length - 1;
+    } else {
+      nextIdx = idx < focusables.length - 1 ? idx + 1 : 0;
+    }
+    focusables[nextIdx].focus();
+    var scrollParent = focusables[nextIdx].closest('.content');
+    if (scrollParent) {
+      focusables[nextIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  // ==================== HELPERS ====================
+  function $(id) { return document.getElementById(id); }
+  function fmt(s) {
+    var m = Math.floor(Math.abs(s) / 60), sc = Math.floor(Math.abs(s) % 60);
+    return String(m).padStart(2, '0') + ':' + String(sc).padStart(2, '0');
+  }
+  function sIcon(name) {
+    for (var k in STEP_ICONS) if (name.indexOf(k) !== -1) return STEP_ICONS[k];
+    return '⏱';
+  }
+
+  // XP
+  function getXP() { return parseInt(localStorage.getItem(CONFIG.storageKey + '_xp') || '0'); }
+  function setXP(v) { localStorage.setItem(CONFIG.storageKey + '_xp', String(v)); }
+  function lvlName() {
+    var x = getXP();
+    for (var i = LEVELS.length - 1; i >= 0; i--) if (x >= LEVELS[i].x) return LEVELS[i].n;
+    return LEVELS[0].n;
+  }
+  function updateXPDisplay() { $('xpDisplay').textContent = getXP() + ' XP'; }
+
+  // Dev time calc
+  function calcTime() {
+    var d = state.data;
+    var t = d.mode === 'c41' ? 210 : (DEV_CHART[state.curF[d.fIdx]] && DEV_CHART[state.curF[d.fIdx]][state.curD[d.dIdx]] ? DEV_CHART[state.curF[d.fIdx]][state.curD[d.dIdx]].t : 480);
+    t *= Math.pow(0.9, d.tV - 68);
+    if (d.push > 0) t *= Math.pow(1.3, d.push);
+    else if (d.push < 0) t *= Math.pow(0.8, Math.abs(d.push));
+    return Math.max(60, Math.round(t));
+  }
+
+  function updateCalcDisplay() {
+    $('calcTime').textContent = fmt(calcTime());
+  }
+
+  // Confirm
+  function showConfirm(msg, cb, xpText) {
+    $('confirmMsg').textContent = msg;
+    var xpEl = $('confirmXp');
+    if (xpText) { xpEl.textContent = xpText; xpEl.classList.add('visible'); }
+    else { xpEl.textContent = ''; xpEl.classList.remove('visible'); }
+    $('confirm-overlay').classList.remove('hidden');
+    state.confirmCb = cb;
+    var btn = $('confirm-overlay').querySelector('.focusable');
+    if (btn) btn.focus();
+  }
+
+  // ==================== PROCESS STEPS ====================
+  function bwSteps(dt) { return [
+    {name:'Pre-Wash',time:60,tip:'Fill at dev temp.',ag:0},{name:'Developer',time:dt,tip:'Agitate first 30s.',ag:30},
+    {name:'Rinse',time:30,tip:'3-4 inversions.',ag:0},{name:'Fixer',time:300,tip:'Under-fix = purple.',ag:60},
+    {name:'Wash',time:600,tip:'Running water.',ag:0},{name:'Photo-Flo',time:60,tip:'Do NOT agitate.',ag:0}]; }
+  function c41Steps() { return [
+    {name:'Pre-Wash',time:60,tip:'102°F.',ag:0},{name:'Developer',time:210,tip:'102°F ±0.5°F.',ag:30},
+    {name:'Blix',time:390,tip:'Agitate 60s.',ag:60},{name:'Wash',time:180,tip:'95-105°F.',ag:0},
+    {name:'Stabilizer',time:60,tip:'Do not rinse.',ag:0}]; }
+  function printSteps() { return [
+    {name:'Developer',time:120,tip:'Rock tray.',ag:0},{name:'Rinse',time:30,tip:'Quick.',ag:0},
+    {name:'Fixer',time:300,tip:'2-5min.',ag:60},{name:'Wash',time:600,tip:'RC 5min.',ag:0}]; }
+
+  function startTimer(steps, info) {
+    var tot = steps.reduce(function(a, s) { return a + s.time; }, 0);
+    state.ts = {steps:steps,cur:0,rem:steps[0].time,total:tot,elapsed:0,running:true,paused:false,lastAg:0,lastTs:0,xfer:0,info:info};
+    navigateTo('timer');
+    buildHearts(); buildClothesline();
+    state.ts.lastTs = performance.now();
+    tick();
+  }
+
+  function tick() {
+    if (!state.ts.running) return;
+    var now = performance.now();
+    var ts = state.ts;
+    if (!ts.paused) {
+      var d = (now - ts.lastTs) / 1000;
+      ts.rem -= d; ts.elapsed += d; ts.lastAg += d;
+      var step = ts.steps[ts.cur];
+      if (step.ag > 0 && ts.lastAg >= step.ag) { ts.lastAg = 0; $('agitateInd').classList.add('active'); setTimeout(function() { $('agitateInd').classList.remove('active'); }, 800); }
+      if (ts.rem <= 0) {
+        if (ts.cur < ts.steps.length - 1) {
+          if (ts.xfer === 0) { ts.xfer = 1; ts.rem = 3; $('timerStepName').textContent = '⚡ TRANSFER'; }
+          else { ts.xfer = 0; ts.cur++; ts.rem = ts.steps[ts.cur].time; ts.lastAg = 0; updateHearts(); updateClothesline(); }
+        } else { finishProcess(); return; }
+      }
+    }
+    ts.lastTs = now;
+    updateTimerUI();
+    setTimeout(tick, 500);
+  }
+
+  function updateTimerUI() {
+    var ts = state.ts;
+    var step = ts.steps[ts.cur];
+    if (ts.xfer === 0) $('timerStepName').textContent = step.name;
+    $('timerDisplay').textContent = fmt(Math.max(0, ts.rem));
+    var te = ts.steps.slice(0, ts.cur).reduce(function(a, s) { return a + s.time; }, 0) + (step.time - ts.rem);
+    $('timerFill').style.width = Math.min(100, (te / ts.total) * 100) + '%';
+    if (ts.cur < ts.steps.length - 1) { var ns = ts.steps[ts.cur + 1]; $('timerNext').textContent = 'Next: ' + ns.name + ' ' + fmt(ns.time); }
+    else $('timerNext').textContent = '⭐ Final step!';
+    $('timerTip').textContent = step.tip || '';
+    $('agitateInd').style.display = step.ag > 0 ? 'block' : 'none';
+  }
+
+  function buildHearts() {
+    var h = $('timerHearts'); h.textContent = '';
+    state.ts.steps.forEach(function(s, i) { h.textContent += i <= state.ts.cur ? '❤' : '♡'; });
+  }
+  function updateHearts() { buildHearts(); }
+
+  function buildClothesline() {
+    var c = $('clothesline'); c.innerHTML = '';
+    state.ts.steps.forEach(function(s) {
+      var item = document.createElement('div'); item.className = 'cl-item';
+      var clip = document.createElement('div'); clip.className = 'cl-clip';
+      var photo = document.createElement('div'); photo.className = 'cl-photo';
+      var icon = document.createElement('span'); icon.className = 'cl-icon'; icon.textContent = sIcon(s.name);
+      photo.appendChild(icon);
+      var label = document.createElement('div'); label.className = 'cl-label'; label.textContent = s.name.substring(0, 4);
+      item.appendChild(clip); item.appendChild(photo); item.appendChild(label); c.appendChild(item);
+    });
+    updateClothesline();
+  }
+  function updateClothesline() {
+    $('clothesline').querySelectorAll('.cl-item').forEach(function(p, i) {
+      p.classList.remove('done', 'active');
+      if (i < state.ts.cur) p.classList.add('done');
+      else if (i === state.ts.cur) p.classList.add('active');
+    });
+  }
+
+  function finishProcess() {
+    state.ts.running = false;
+    updateHearts(); updateClothesline();
+    var m = state.ts.info.mode || 'free';
+    var amt = XP_REWARDS[m] || 10;
+    setXP(getXP() + amt); updateXPDisplay();
+    var entry = {date:new Date().toISOString(), mode:m, film:state.ts.info.film||'', totalElapsed:Math.round(state.ts.elapsed)};
+    var log = JSON.parse(localStorage.getItem(CONFIG.storageKey + '_log') || '[]');
+    log.unshift(entry); localStorage.setItem(CONFIG.storageKey + '_log', JSON.stringify(log));
+    showConfirm('Complete!', function() { navigateTo('home', {addToHistory:false}); }, '+ ' + amt + ' XP');
+  }
+
+  // Badges
+  function getStats() {
+    var log = JSON.parse(localStorage.getItem(CONFIG.storageKey + '_log') || '[]');
+    var s = {bw:0,c41:0,push:0,prints:0,tests:0,free:0,total:log.length};
+    log.forEach(function(e) {
+      if (e.mode==='bw') s.bw++; else if (e.mode==='c41') s.c41++;
+      else if (e.mode==='push') s.push++; else if (e.mode==='print-final') s.prints++;
+      else if (e.mode==='print-test') s.tests++; else s.free++;
+    });
+    return s;
+  }
+  function renderBadges() {
+    var st = getStats();
+    ['film','print','mastery'].forEach(function(cat) {
+      var c = $(cat === 'film' ? 'filmBadges' : cat === 'print' ? 'printBadges' : 'masteryBadges');
+      c.innerHTML = '';
+      BADGES.filter(function(b) { return b.cat === cat; }).forEach(function(b) {
+        var cnt = b.fn(st), u = cnt >= b.need, pct = Math.min(100, (cnt / b.need) * 100);
+        c.innerHTML += '<div class="badge-card ' + (u?'unlocked':'locked') + '"><span class="badge-icon">' + (u?b.icon:'🔒') +
+          '</span><span class="badge-name">' + b.name + '</span><div class="badge-bar"><div class="badge-fill" style="width:' +
+          pct + '%"></div></div><span class="badge-count">' + cnt + '/' + b.need + '</span></div>';
+      });
+    });
+    $('badgeLvl').textContent = lvlName();
+  }
+
+  function renderLog() {
+    var log = JSON.parse(localStorage.getItem(CONFIG.storageKey + '_log') || '[]');
+    var el = $('logEntries');
+    if (!log.length) { el.innerHTML = '<div class="empty-state">No sessions yet.</div>'; return; }
+    el.innerHTML = log.slice(0, 8).map(function(e) {
+      var d = new Date(e.date);
+      var label = e.mode==='bw'?'B&W':e.mode==='c41'?'C-41':'Other';
+      return '<div class="log-entry"><span class="log-date">' + d.toLocaleDateString() +
+        '</span><span class="log-mode">' + label + (e.film?' — '+e.film:'') +
+        '</span><span class="log-detail">' + fmt(e.totalElapsed) + '</span></div>';
+    }).join('');
+  }
+
+  // ==================== ACTION HANDLING ====================
+  function handleAction(action, element) {
+    switch (action) {
+      case 'back': navigateBack(); break;
+
+      // Home nav
+      case 'setup-bw': state.data.mode='bw'; state.curF=FILMS; state.curD=DEVS; state.data.fIdx=0; state.data.dIdx=0; state.data.push=0; navigateTo('setup'); break;
+      case 'setup-c41': state.data.mode='c41'; state.curF=C41_FILMS; state.curD=['C-41 Kit']; state.data.fIdx=0; state.data.dIdx=0; state.data.push=0; navigateTo('setup'); break;
+      case 'setup-push': state.data.mode='push'; state.curF=FILMS; state.curD=DEVS; state.data.fIdx=0; state.data.dIdx=0; state.data.push=0; navigateTo('setup'); break;
+      case 'setup-print': navigateTo('print-setup'); break;
+      case 'go-free': navigateTo('free-setup'); break;
+      case 'go-badges': navigateTo('badges'); break;
+      case 'go-ref': navigateTo('ref'); break;
+      case 'go-log': navigateTo('log'); break;
+
+      // Setup pickers
+      case 'film-prev': state.data.fIdx = (state.data.fIdx - 1 + state.curF.length) % state.curF.length; break;
+      case 'film-next': state.data.fIdx = (state.data.fIdx + 1) % state.curF.length; break;
+      case 'dev-prev': state.data.dIdx = (state.data.dIdx - 1 + state.curD.length) % state.curD.length; break;
+      case 'dev-next': state.data.dIdx = (state.data.dIdx + 1) % state.curD.length; break;
+      case 'dil-prev': state.data.dlIdx = (state.data.dlIdx - 1 + DILS.length) % DILS.length; break;
+      case 'dil-next': state.data.dlIdx = (state.data.dlIdx + 1) % DILS.length; break;
+      case 'temp-down': state.data.tV--; break;
+      case 'temp-up': state.data.tV++; break;
+      case 'push-down': state.data.push = Math.max(-3, state.data.push - 1); break;
+      case 'push-up': state.data.push = Math.min(3, state.data.push + 1); break;
+      case 'start-process': startTimer(state.data.mode==='c41'?c41Steps():bwSteps(calcTime()), {mode:state.data.mode, film:state.curF[state.data.fIdx], dev:state.curD[state.data.dIdx]}); break;
+
+      // Print setup
+      case 'mode-prev': case 'mode-next': state.data.pM = state.data.pM==='test'?'final':'test'; break;
+      case 'base-down': state.data.sv.base = Math.max(1, state.data.sv.base-1); break;
+      case 'base-up': state.data.sv.base = Math.min(120, state.data.sv.base+1); break;
+      case 'strips-down': state.data.sv.strips = Math.max(2, state.data.sv.strips-1); break;
+      case 'strips-up': state.data.sv.strips = Math.min(12, state.data.sv.strips+1); break;
+      case 'exp-down': state.data.sv.exp = Math.max(1, state.data.sv.exp-1); break;
+      case 'exp-up': state.data.sv.exp = Math.min(300, state.data.sv.exp+1); break;
+      case 'start-print':
+        var steps;
+        if (state.data.pM === 'test') {
+          steps = [];
+          for (var i = 1; i <= state.data.sv.strips; i++) steps.push({name:'Strip '+i,time:state.data.sv.base,tip:i<state.data.sv.strips?'Cover next':'Last!',ag:0});
+          steps = steps.concat(printSteps());
+        } else {
+          steps = [{name:'Exposure',time:state.data.sv.exp,tip:'Hold still.',ag:0}].concat(printSteps());
+        }
+        startTimer(steps, {mode:'print-'+state.data.pM});
+        break;
+
+      // Free timer
+      case 'min-down': state.data.sv.min = Math.max(0, state.data.sv.min-1); break;
+      case 'min-up': state.data.sv.min = Math.min(60, state.data.sv.min+1); break;
+      case 'sec-down': state.data.sv.sec = Math.max(0, state.data.sv.sec-5); break;
+      case 'sec-up': state.data.sv.sec = Math.min(55, state.data.sv.sec+5); break;
+      case 'start-free':
+        var s = state.data.sv.min*60 + state.data.sv.sec;
+        if (s > 0) startTimer([{name:'Free Timer',time:s,tip:'',ag:0}], {mode:'free'});
+        break;
+
+      // Timer controls
+      case 'pause': state.ts.paused = !state.ts.paused; $('btnPause').textContent = state.ts.paused ? 'Resume' : 'Pause'; if (!state.ts.paused) state.ts.lastTs = performance.now(); break;
+      case 'skip':
+        if (state.ts.cur >= state.ts.steps.length-1) { finishProcess(); }
+        else { state.ts.elapsed += state.ts.rem; state.ts.xfer=0; state.ts.cur++; state.ts.rem=state.ts.steps[state.ts.cur].time; state.ts.lastAg=0; updateHearts(); updateClothesline(); }
+        break;
+      case 'exit-timer': state.ts.running = false; navigateTo('home', {addToHistory:false}); break;
+
+      // Confirm
+      case 'confirm-yes': $('confirm-overlay').classList.add('hidden'); if (state.confirmCb) state.confirmCb(); break;
+      case 'confirm-no': $('confirm-overlay').classList.add('hidden'); break;
+    }
+
+    // Update displays after any action
+    updateDisplays();
+  }
+
+  function updateDisplays() {
+    var d = state.data;
+    if ($('filmVal')) $('filmVal').textContent = state.curF[d.fIdx] || '';
+    if ($('devVal')) $('devVal').textContent = state.curD[d.dIdx] || '';
+    if ($('dilVal')) $('dilVal').textContent = DILS[d.dlIdx] || '';
+    if ($('tempVal')) $('tempVal').textContent = d.tV + '°F';
+    if ($('pushVal')) $('pushVal').textContent = (d.push > 0 ? '+' : '') + d.push;
+    if ($('calcTime')) updateCalcDisplay();
+    if ($('modeVal')) $('modeVal').textContent = d.pM === 'test' ? 'Test Strip' : 'Final';
+    if ($('baseVal')) $('baseVal').textContent = d.sv.base + 's';
+    if ($('stripsVal')) $('stripsVal').textContent = d.sv.strips;
+    if ($('expVal')) $('expVal').textContent = d.sv.exp + 's';
+    if ($('minVal')) $('minVal').textContent = d.sv.min;
+    if ($('secVal')) $('secVal').textContent = d.sv.sec;
+    // Show/hide conditional rows
+    if ($('dilRow')) $('dilRow').classList.toggle('hidden', d.mode === 'c41');
+    if ($('pushRow')) $('pushRow').classList.toggle('hidden', d.mode === 'c41');
+    if ($('testOpts')) $('testOpts').classList.toggle('hidden', d.pM !== 'test');
+    if ($('finalOpts')) $('finalOpts').classList.toggle('hidden', d.pM !== 'final');
+  }
+
+  function onScreenEnter(screenId) {
+    switch (screenId) {
+      case 'setup':
+        $('setupTitle').textContent = state.data.mode==='bw' ? 'B&W Setup' : state.data.mode==='c41' ? 'C-41 Setup' : 'Push/Pull';
+        updateDisplays();
+        break;
+      case 'print-setup': updateDisplays(); break;
+      case 'free-setup': updateDisplays(); break;
+      case 'badges': renderBadges(); break;
+      case 'log': renderLog(); break;
+      case 'home': updateXPDisplay(); break;
+    }
+  }
+
+  // ==================== EVENT LISTENERS ====================
+  function setupEvents() {
+    document.addEventListener('click', function(e) {
+      var actionEl = e.target.closest('[data-action]');
+      if (actionEl) handleAction(actionEl.dataset.action, actionEl);
+    });
+
+    document.addEventListener('keydown', function(e) {
+      switch (e.key) {
+        case 'ArrowUp':
+          moveFocus('up');
+          e.preventDefault();
+          break;
+        case 'ArrowDown':
+          moveFocus('down');
+          e.preventDefault();
+          break;
+        case 'ArrowLeft':
+          moveFocus('left');
+          e.preventDefault();
+          break;
+        case 'ArrowRight':
+          moveFocus('right');
+          e.preventDefault();
+          break;
+        case 'Enter':
+          if (document.activeElement && document.activeElement.classList.contains('focusable')) {
+            document.activeElement.click();
+          }
+          e.preventDefault();
+          break;
+        case 'Escape':
+          navigateBack();
+          e.preventDefault();
+          break;
+      }
+    });
+  }
+
+  // ==================== SDK ====================
+  function initSDK() {
+    if (typeof MetaGlassSDK !== 'undefined' && MetaGlassSDK.isSupported) {
+      sdk = MetaGlassSDK;
+      if (sdk.navigation) sdk.navigation.setBackBehavior('escape');
+      return true;
+    }
+    return false;
+  }
+
+  // ==================== INIT ====================
+  function init() {
+    collectScreens();
+    setupEvents();
+
+    setTimeout(function() {
+      initSDK();
+      navigateTo('home', { addToHistory: false });
+    }, 100);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script></body></html>

@@ -429,21 +429,21 @@ body{font-family:monospace!important}
 <div class="setup-title" id="setupTitle">B&W FILM DEVELOPMENT</div>
 
 <div id="setupFilm" class="form-group">
-<button class="cycle-picker focusable" onclick="beepSelect();pickNext('film')"><span class="cycle-label">FILM</span><span class="cycle-val" id="filmPickVal">—</span><span class="cycle-arrow">&#9654;</span></button>
+<button class="cycle-picker focusable" onclick="beepSelect();pickNext('film');this.focus()"><span class="cycle-label">FILM</span><span class="cycle-val" id="filmPickVal">—</span><span class="cycle-arrow">&#9654;</span></button>
 </div>
 <div id="setupDev" class="form-group">
-<button class="cycle-picker focusable" onclick="beepSelect();pickNext('dev')"><span class="cycle-label">DEV</span><span class="cycle-val" id="devPickVal">—</span><span class="cycle-arrow">&#9654;</span></button>
+<button class="cycle-picker focusable" onclick="beepSelect();pickNext('dev');this.focus()"><span class="cycle-label">DEV</span><span class="cycle-val" id="devPickVal">—</span><span class="cycle-arrow">&#9654;</span></button>
 </div>
 <div id="setupDilution" class="form-group">
-<button class="cycle-picker focusable" onclick="beepSelect();pickNext('dil')"><span class="cycle-label">DILUTION</span><span class="cycle-val" id="dilPickVal">—</span><span class="cycle-arrow">&#9654;</span></button>
+<button class="cycle-picker focusable" onclick="beepSelect();pickNext('dil');this.focus()"><span class="cycle-label">DILUTION</span><span class="cycle-val" id="dilPickVal">—</span><span class="cycle-arrow">&#9654;</span></button>
 </div>
 
 <div class="form-group" style="margin-bottom:12px">
 <div class="temp-stepper">
 <span class="cycle-label" style="min-width:55px">TEMP</span>
-<button class="temp-step-btn focusable" onclick="beepNav();adjTemp(-1)">−</button>
+<button class="temp-step-btn focusable" id="tempDown" onclick="beepNav();adjTemp(-1);this.focus()">−</button>
 <span class="cycle-val" id="tempDisplay">68°F</span>
-<button class="temp-step-btn focusable" onclick="beepNav();adjTemp(1)">+</button>
+<button class="temp-step-btn focusable" id="tempUp" onclick="beepNav();adjTemp(1);this.focus()">+</button>
 </div>
 <div class="temp-toggle" style="margin-top:8px;margin-bottom:8px">
 <button class="active" id="btnF" onclick="setTempUnit('F')">F</button>
@@ -454,9 +454,9 @@ body{font-family:monospace!important}
 <div id="setupPush">
 <span class="form-label">PUSH / PULL</span>
 <div class="push-row">
-<button class="push-btn" onclick="beepNav();adjPush(-1)">−</button>
+<button class="push-btn" onclick="beepNav();adjPush(-1);this.focus()">−</button>
 <div class="push-val" id="pushVal">0</div>
-<button class="push-btn" onclick="beepNav();adjPush(1)">+</button>
+<button class="push-btn" onclick="beepNav();adjPush(1);this.focus()">+</button>
 </div>
 </div>
 
@@ -477,24 +477,24 @@ body{font-family:monospace!important}
 <div id="testStripOpts">
 <span class="form-label">BASE EXPOSURE (SEC)</span>
 <div class="free-stepper">
-<button onclick="beepNav();adjVal('baseExp',-1)">−</button>
+<button onclick="beepNav();adjVal('baseExp',-1);this.focus()">−</button>
 <span class="free-val" id="baseExpVal">5</span>
-<button onclick="beepNav();adjVal('baseExp',1)">+</button>
+<button onclick="beepNav();adjVal('baseExp',1);this.focus()">+</button>
 </div>
 <span class="form-label">NUMBER OF STRIPS</span>
 <div class="free-stepper">
-<button onclick="beepNav();adjVal('strips',-1)">−</button>
+<button onclick="beepNav();adjVal('strips',-1);this.focus()">−</button>
 <span class="free-val" id="stripsVal">5</span>
-<button onclick="beepNav();adjVal('strips',1)">+</button>
+<button onclick="beepNav();adjVal('strips',1);this.focus()">+</button>
 </div>
 </div>
 
 <div id="finalExpOpts" class="hidden">
 <span class="form-label">EXPOSURE TIME (SEC)</span>
 <div class="free-stepper">
-<button onclick="beepNav();adjVal('finalExp',-1)">−</button>
+<button onclick="beepNav();adjVal('finalExp',-1);this.focus()">−</button>
 <span class="free-val" id="finalExpVal">12</span>
-<button onclick="beepNav();adjVal('finalExp',1)">+</button>
+<button onclick="beepNav();adjVal('finalExp',1);this.focus()">+</button>
 </div>
 </div>
 
@@ -531,16 +531,16 @@ body{font-family:monospace!important}
 
 <span class="form-label">MINUTES</span>
 <div class="free-stepper">
-<button onclick="beepNav();adjVal('freeMin',-1)">−</button>
+<button onclick="beepNav();adjVal('freeMin',-1);this.focus()">−</button>
 <span class="free-val" id="freeMinVal">5</span>
-<button onclick="beepNav();adjVal('freeMin',1)">+</button>
+<button onclick="beepNav();adjVal('freeMin',1);this.focus()">+</button>
 </div>
 
 <span class="form-label">SECONDS</span>
 <div class="free-stepper">
-<button onclick="beepNav();adjVal('freeSec',-5)">−</button>
+<button onclick="beepNav();adjVal('freeSec',-5);this.focus()">−</button>
 <span class="free-val" id="freeSecVal">0</span>
-<button onclick="beepNav();adjVal('freeSec',5)">+</button>
+<button onclick="beepNav();adjVal('freeSec',5);this.focus()">+</button>
 </div>
 
 <button class="start-btn" onclick="beepSelect();startFree()">START</button>
